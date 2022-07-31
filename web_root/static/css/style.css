@@ -1,0 +1,13 @@
+body,html {
+	font-size:24px;
+	height: 100%;
+	background-color: #f6f7f9
+}
+
+.btn-big{
+	font-size: 60px;
+}
+
+td {
+  font-size: 24px;
+}
