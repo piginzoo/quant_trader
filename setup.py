@@ -27,10 +27,5 @@ setup(
     cmdclass={
         'clean': CleanCommand,
     },
-    packages=find_packages(where=".", include=('quant_trader.*'),exclude=('tests', 'tests.*')),
-    package_data={
-        "": ["*.jar", "*.json"],
-        "config": ["config/*.json"],
-        "thirdlibrary": ["thirdlibrary/*.jar"],
-    },
+    packages=find_packages(where=".", exclude=('test', 'test.*', 'conf'), include=('*',))
 )

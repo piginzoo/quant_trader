@@ -246,34 +246,3 @@ def is_in_position(code):
                 logger.debug("股票[%s]在真实持仓中", code)
                 return True
     return False
-
-
-def push_signals(target_date):
-    """
-    将买、卖信号推送到服务器
-    :return:
-    """
-
-    db_engine = utils.connect_db()
-    df = pd.read_sql(f"select * from cta_signal where 信号日期='{target_date}' and 状态!='done'", db_engine)
-
-    if len(df) == 0:
-        notifier.notify(f"今日[{target_date}]没有任何买入信号，也没有最大回撤触发的卖出信号", INFO)
-
-    logger.debug("今日[%s]的买卖信号出现%d次，准备推送到服务器", target_date, len(df))
-
-    try:
-        for index, data in df.iterrows():
-            if data['买卖'] == 'buy':
-                if not buy(data['股票代码'], target_date, data['策略名称']): continue
-            else:
-                if not sell(data['股票代码'], data['股数']): continue
-
-            # 更新推送状态=>done
-            db_utils.run_sql(db_engine,
-                             f"update cta_signal set 状态='done' where  股票代码='{data['股票代码']}' and 买卖='{data['买卖']}' and 信号日期='{data['信号日期']}'")
-
-            logger.info("推送股票[%s]于[%s]日的[%s]信号到服务器去: 股数[%.0f]", data['股票代码'], data['信号日期'], data['买卖'], data['股数'])
-    except ConnectionError:
-        logger.exception("推送股票买卖信号到服务器失败")
-        raise RuntimeError("推送股票买卖信号到服务器失败，可能是服务器服务未开启")
