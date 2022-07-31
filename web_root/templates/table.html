@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <head>
+        <title>股票信息</title>
+        </style>
+        <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js">
+        </script>
+        <script>
+                $(document).ready(function(){
+                     $.ajax({
+                        url: '{{ query_url | safe }}',
+                        type: 'get',
+                        success: function (json_data) {
+                            $('#title').html(json_data.title);
+                            create_table(json_data.data, '#table');
+                        },
+                        error: function (res) {
+                            console.log("错误发生：")
+                            console.log(res)
+                        }
+                    });
+                });
+
+                //删除
+                function delete_row(){
+
+                    var id = $('input[name="id"]:checked').val();
+                    if (id == undefined){
+                        console.log("未选择记录");
+                        return;
+                    }
+
+                    if (!confirm('你确信你要删除选中的记录吗?')) {
+                        return;
+                    }
+
+                    console.log("delete");
+
+                    $.ajax({
+                        url: '{{ delete_url | safe }}'+'&id='+id,
+                        type: 'get',
+                        success: function (json_data) {
+                             location.reload();
+                        },
+                        error: function (res) {
+                            console.log("错误发生：")
+                            console.log(res)
+                        }
+                    });
+
+                }
+
+                //删除
+                function complete_row(){
+
+                    var id = $('input[name="id"]:checked').val();
+                    if (id == undefined){
+                        console.log("未选择记录");
+                        return;
+                    }
+
+                    if (!confirm('你确信你要人肉确认交易完成么？会影响持仓和交易日志！！！')) {
+                        return;
+                    }
+
+                    console.log("complete");
+
+                    $.ajax({
+                        url: '{{ complete_url | safe }}'+'&id='+id,
+                        type: 'get',
+                        success: function (json_data) {
+                             location.reload();
+                        },
+                        error: function (res) {
+                            console.log("错误发生：")
+                            console.log(res)
+                        }
+                    });
+
+                }
+
+                 function create_table(list, selector) {
+
+                     // Getting the all column names
+                     var cols = get_header(list, selector);
+
+                     // Traversing the JSON data
+                     for (var i = 0; i <list.length ; i++) {
+                         var row = $('<tr/>');
+                         console.log(list[i]);
+                         row.append($('<td/>').html('<input type="radio" name="id" value='+list[i]['id']+'>'));
+
+                         for (var colIndex = 0; colIndex <cols.length ; colIndex++)
+                         {
+                             var val = list [i][cols[colIndex]];
+
+                             // If there is any key, which is matching
+                             // with the column name
+                             if (val == null) val = "" ;
+                                 row.append($('<td/>').html(val));
+                         }
+
+                         // Adding each row to the table
+                         $(selector).append(row);
+                     }
+                 }
+
+                 function get_header(list, selector) {
+                     var columns = [];
+                     var header = $('<tr />');
+
+                     //radio
+                     header.append($('<th/>').html(''));
+
+                     for (var i = 0; i <list.length ; i++) {
+                         var row = list [i];
+
+                         for (var k in row) {
+                             if ($.inArray(k, columns) == -1) {
+                                 columns.push(k);
+
+                                 // Creating the header
+                                 header.append($('<th/>').html(k));
+                             }
+                         }
+                     }
+
+                     // Appending the header to the table
+                     $(selector).append(header);
+                         return columns;
+                 }
+        </script>
+    </head>
+
+<body style="text-align:center;" id="body">
+
+    <div class="container-fluid container-panel">
+
+        <div>
+            <h2 id="title"></h2>
+        </div>
+
+        <div>
+            <a class="btn btn-block btn-primary" href="/query?token=dapenti@piginzoo.com" role="button">返回</a>
+        </div>
+
+        <table align="center" id="table" class="table table-striped">
+        </table>
+
+        {% if delete_url is defined %}
+        <button class="btn btn-danger" id="delete_button" type="submit" onclick="delete_row();">删除</button>
+        {% endif %}
+
+        {% if complete_url is defined %}
+        <button class="btn btn-success" id="complete_button" type="submit" onclick="complete_row();">手工完成</button>
+        {% endif %}
+
+    </div>
+
+</body>
+
+</html>

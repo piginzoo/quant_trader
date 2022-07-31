@@ -1,0 +1,11 @@
+debug/
+conf/config.yml
+.venv/
+data/
+.idea/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+logs
+

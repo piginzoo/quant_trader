@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>股票信息</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="container-fluid container-panel">
+    <div class="card-header">
+        <i class="fa fa-database" aria-hidden="true">功能</i>
+    </div>
+
+    <div class="card">
+        <h2> 查看数据库 </h2>
+        <ul class="list-group">
+            <li class=" list-group-item alert-primary" role="alert" align="center">
+                <a href="/query?action=position&token=dapenti@piginzoo.com" class="btn btn-block btn-big btn-primary vcenter">当前持仓</a>
+            </li>
+
+            <li class="list-group-item alert alert-primary" role="alert" align="center">
+                <a href="/query?action=task&token=dapenti@piginzoo.com"
+                   class="btn btn-block btn-big btn-primary vcenter">待交易任务</a>
+            </li>
+
+            <li class="list-group-item alert alert-primary" role="alert" align="center">
+                <a href="/query?action=log&token=dapenti@piginzoo.com"
+                   class="btn btn-block btn-big btn-primary vcenter">交易日志</a>
+            </li>
+
+            <ul/>
+    </div>
+    <div class="card">
+        <h2> 查看软件结果 </h2>
+        <ul class="list-group">
+            <li class="list-group-item alert-primary" role="alert" align="center">
+                <a href="/query?action=true_position&token=dapenti@piginzoo.com"
+                   class="btn btn-block btn-big btn-primary vcenter">真实持仓</a>
+            </li>
+
+            <li class="list-group-item alert-primary" role="alert" align="center">
+                <a href="/query?action=today_entrusts&token=dapenti@piginzoo.com"
+                   class="btn btn-block btn-big btn-primary vcenter">当日委托</a>
+            </li>
+
+
+            <li class="list-group-item alert-primary" role="alert" align="center">
+                <a href="/query?action=today_trades&token=dapenti@piginzoo.com"
+                   class="btn btn-block btn-big btn-primary vcenter">当日成交</a>
+            </li>
+
+            <li class="list-group-item alert-primary" role="alert" align="center">
+                <a href="/query?action=balance&token=dapenti@piginzoo.com" class="btn btn-block btn-big btn-primary vcenter">头寸情况</a>
+            </li>
+
+        </ul>
+    </div>
+</div>
+</body>
+</html>

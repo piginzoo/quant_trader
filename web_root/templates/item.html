@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>股票信息</title>
+    </style>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container container-panel">
+        <div>
+            <h2>{{title}}</h2>
+        </div>
+
+        <div>
+            <a class="btn btn-block btn-primary vcenter" href="/query?token=dapenti@piginzoo.com" role="button">返回</a>
+        </div>
+        
+        <div class="list-group">
+            {% for key,value in data.items()%}
+            <div class="list-group-item">
+                <div class="col-md-4 ">{{key}}</div>
+                <div class="col-md-4"> {{value}}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+
+</html>

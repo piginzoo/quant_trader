@@ -1,0 +1,142 @@
+* {
+    color: #3e3e3e;
+}
+
+p {
+    letter-spacing: 1px !important;
+    line-height: 1.7 !important;
+    min-height: 1em !important;
+    box-sizing: border-box !important;
+    word-wrap: break-word !important;
+    text-align: justify;
+    margin: 20px 0 !important;
+}
+
+blockquote {
+    border-left: 10px solid rgba(128, 128, 128, 0.075);
+    background-color: rgba(128, 128, 128, 0.05);
+    padding: 13px 15px !important;
+    margin: 0px;
+}
+
+blockquote p {
+    color: #898989;
+    margin: 0px;
+}
+
+strong {
+    font-weight: normal;
+    color: #FD5B03;
+}
+
+body {
+    font-size: 15px;
+}
+
+pre {
+    background-color: #f8f8f8;
+    border-radius: 3px;
+    word-wrap: break-word;
+    padding: 12px 13px;
+    font-size: 13px;
+    color: #898989;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    word-break: break-all !important;
+    margin: 20px 0;
+    line-height: 1.2;
+    text-align: left;
+    font-weight: bold;
+    padding-left: 15px;
+}
+
+h1 {
+    border-left: 6px solid #71BA51 !important;
+    font-size: 20px !important;
+}
+
+h2 {
+    border-left: 4px solid #71BA51 !important;
+    font-size: 18px !important;
+}
+
+h3 {
+    border-left: 4px solid #71BA51 !important;
+}
+
+a {
+    color: #4183C4 !important;
+    text-decoration: none !important;
+}
+
+ul, ol {
+    padding-left: 30px;
+}
+
+li {
+    line-height: 24px;
+}
+
+hr {
+    height: 4px;
+    padding: 0;
+    margin: 16px 0;
+    background-color: #e7e7e7;
+    border: 0 none;
+    overflow: hidden;
+    box-sizing: content-box;
+    border-bottom: 1px solid #ddd;
+}
+
+pre {
+    background: #f2f2f2 !important;
+    padding: 12px 13px;
+}
+
+code {
+    color: #a71d5d;
+}
+
+/*左边目录框的样式*/
+.toc {
+    height: 100%; /*目录框的高度*/
+    float: left; /*目录框的位置*/
+    overflow-y: scroll; /*目录框添加滚动条*/
+    padding-right: 10px;
+    position: fixed; /*目录框相对浏览器进行定位*/
+    width: 17%; /*目录框的宽度*/
+}
+
+/*右边正文的样式*/
+.contents {
+    float: right; /*正文的位置*/
+    padding-left: 10px; /*边距*/
+    width: 80%; /*正文的宽度*/
+}
+
+/*表格样式*/
+table {
+    font-family: verdana, arial, sans-serif;
+    font-size: 14px;
+    color: #333333;
+    border-width: 1px;
+    border-color: #666666;
+    border-collapse: collapse;
+}
+
+table th {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #dedede;
+}
+
+table td {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
+}
