@@ -16,7 +16,6 @@ from dateutil.relativedelta import relativedelta
 from pandas import Series
 from sqlalchemy import create_engine
 
-
 from quant_trader import utils
 from quant_trader.utils import conf
 
@@ -416,7 +415,8 @@ def http_json_post(url, dict_msg):
 
 
 def tushare_api():
-    return tushare.pro_api()
+    token = utils.CONF['datasources']['tushare']['token']
+    return tushare.pro_api(token)
 
 
 def is_trade_day():
