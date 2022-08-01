@@ -17,7 +17,7 @@ from pandas import Series
 from sqlalchemy import create_engine
 
 import conf
-import utils
+from quant_trader import utils
 
 logger = logging.getLogger(__name__)
 
