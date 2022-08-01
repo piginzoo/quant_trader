@@ -89,6 +89,7 @@ def api():
             # 卖的时候，price和策略都未定义
             price = params.get('price', -1)  # 卖出没有价格字段，赋值为-1
             strategy = params.get('strategy', '')  # 卖出没有策略字段，赋值为''
+            broker_name = params.get('broker_name','')  # 卖出没有券商字段，赋值为''
 
             if len(sqlite.query_task(code)) > 0:
                 logger.warning("股票[%s]的买卖请求[%s]已经存在", code, action)
@@ -101,7 +102,7 @@ def api():
             notifier.notify(msg, INFO)
 
             # 将买卖任务，插入到任务表中
-            sqlite.task(code, action, price, share, signal_date, strategy)
+            sqlite.task(code, action, price, share, signal_date, strategy,broker_name)
             return jsonify({'code': 0, 'msg': f'{action} data save to server'}), 200
 
         # 立刻买入，主要用于测试用
