@@ -16,8 +16,9 @@ from dateutil.relativedelta import relativedelta
 from pandas import Series
 from sqlalchemy import create_engine
 
-import conf
+
 from quant_trader import utils
+from quant_trader.utils import conf
 
 logger = logging.getLogger(__name__)
 
