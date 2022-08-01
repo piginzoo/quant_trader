@@ -34,25 +34,43 @@ class TradeJob():
             logger.exception('检索任务失败')
             return
 
-        # 要对任务排序，先执行卖的任务
+        task_dict = self.order_by_broker(tasks)
+        for broker_name,broker_tasks in task_dict.items():
 
+            # 先切换到券商账号（每次都调，如果已经登录了，就会忽略，easytrader控制）
+            broker.connect(broker_name)
+
+            # TODO: 对任务排序，先执行卖的任务
+
+            for task in tasks:
+                try:
+                    start_time = time.time()
+                    logger.info("执行任务开始：%r，进程：%d", task, os.getpid())
+
+                    if task.trade_type == TRADE_BUY:
+                        self.buy_action.do_action(task, broker)
+
+                    # 如果是卖的话，要尽快卖出去，所以要多尝试几次
+                    if task.trade_type == TRADE_SELL:
+                        self.sell_action.do_action(task, broker)
+
+                    logger.debug("执行任务结束：%r，耗时：%d 秒", task, time.time() - start_time)
+                except:
+                    logger.exception('Broker客户端执行任务[%r]失败', task)
+
+    def order_by_broker(self,tasks):
+        """
+        对买卖按照broker（券商）的不同来处理，
+        原因是每个broker（券商），都需要登录，切换到对应的券商去，
+        所以要一个券商的买卖要集中到一起搞
+        :return: 一个字典，每个key是这个券商的买卖tasks
+        """
+        task_results={}
         for task in tasks:
-
-            try:
-                start_time = time.time()
-                logger.info("执行任务开始：%r，进程：%d", task, os.getpid())
-
-                if task.trade_type == TRADE_BUY:
-                    self.buy_action.do_action(task, broker)
-
-                # 如果是卖的话，要尽快卖出去，所以要多尝试几次
-                if task.trade_type == TRADE_SELL:
-                    self.sell_action.do_action(task, broker)
-
-                if task.trade_type == TRADE_BALANCE:
-                    result = broker.balance()
-                    logger.debug("测试用，返回资金情况：%r", result)
-
-                logger.debug("执行任务结束：%r，耗时：%d 秒", task, time.time() - start_time)
-            except:
-                logger.exception('Broker客户端执行任务[%r]失败', task)
+            if task.broker is None or task.broker=='':
+                task.broker = 'Unknown'
+            if task_results.get(task.broker,None) is None:
+                task_results[task.broker]=[task]
+            else:
+                task_results[task.broker] +=[task]
+        return task_results

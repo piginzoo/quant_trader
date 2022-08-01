@@ -36,7 +36,8 @@ class PositionSyncJob():
                                      share=float(true_position['股票余额']),
                                      signal_date=utils.today(),  # 信号日，本来应该是头一天的交易日，犯懒了，暂时用今天 TODO
                                      trade_datetime=utils.now(),
-                                     strategy='Unknown') # 发现这种实盘有，逻辑盘没有的情况，你就不知道这个是从哪个策略来的了
+                                     strategy='Unknown',
+                                     broker_name=???) # 发现这种实盘有，逻辑盘没有的情况，你就不知道这个是从哪个策略来的了
             if sqlite.create_position(position):
                 msg = f"股票[%s]持仓修正：根据真实持仓创建逻辑持仓：%r" % (true_position['证券代码'], position)
                 notifier.notify(msg, INFO)

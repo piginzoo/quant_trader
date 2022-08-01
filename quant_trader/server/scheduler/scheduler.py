@@ -12,6 +12,10 @@ from quant_trader.server.scheduler.position_sync_job import PositionSyncJob
 from quant_trader.server.scheduler.trade_job import TradeJob
 
 """
+为何扼要使用python的调度器，而不是用linux自带的contab呢？
+1、不想依赖于外部配置，这样，代码就可以一键配置好了，不用再配置这配置那
+2、逻辑上、阅读上更连贯，从代码中就可以获取一切，而不需要再读什么外部文档
+
 参考：
  - https://www.cnblogs.com/leffss/p/11912364.html
  遇到一个坑：用进程池，死活报错：
@@ -30,8 +34,9 @@ logger = logging.getLogger(__name__)
 
 def start_scheduler(broker):
     """
+    目前有2个调度：
     - 每天 9:30 点运行，每隔10分钟，执行一次买卖
-    - 每天 0:00 运行，执行一遍同步
+    - 每天 23:00 运行，执行一遍同步
     # https://tooltt.com/crontab/c/83.html
     """
 

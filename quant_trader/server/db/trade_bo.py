@@ -54,13 +54,14 @@ class DBInfoMixin():
 class TradeTask(Base, DBInfoMixin):
     __tablename__ = 'trade_task'
 
-    def __init__(self, code, trade_type, price, share, signal_date, strategy):
+    def __init__(self, code, trade_type, price, share, signal_date, strategy,broker_name):
         self.code = code
         self.trade_type = trade_type
         self.signal_date = signal_date
         self.price = price  # 这个是头天的价格
         self.share = share
         self.strategy = strategy
+        self.broker_name = broker_name
         self.retry = 0
         self.last_datetime = utils.now()
         self.entrust_no = ''  # 开始的时候没有，会被更新
@@ -70,6 +71,7 @@ class TradeTask(Base, DBInfoMixin):
     price = Column(Float())  # 头天的价格
     share = Column(Float())  # 股
     strategy = Column(String)  # 对应的策略名
+    broker_name = Column(String)  # 券商名字：通用(mock)、银河(yinhe)、国金....
     trade_type = Column(String(9))
     signal_date = Column(String(8))  # 20220202
     entrust_no = Column(String(8))  # 委托单合同编号，需要被更新
@@ -100,6 +102,7 @@ class TradeLog(Base, DBInfoMixin):
     trade_type = Column(String(9))
     signal_date = Column(String(8))  #
     strategy = Column(String)  # 对应的策略名
+    broker_name = Column(String)  # 券商名字：通用(mock)、银河(yinhe)、国金....
     trade_datetime = Column(String(14))  # 20220202190133
     price = Column(Float())  # 价格
     share = Column(Float())  # 股
@@ -111,8 +114,10 @@ class TradeLog(Base, DBInfoMixin):
         self.trade_type = task.trade_type
         self.signal_date = task.signal_date
         self.strategy = task.strategy
+        self.broker_name = task.broker_name
         self.share = task.share
         self.price = task.price
+        self.broker_name = task.broker_name
 
         self.trade_datetime = utils.now(),
         self.status = status
@@ -133,14 +138,16 @@ class TradePosition(Base, DBInfoMixin):
     trade_datetime = Column(String(14))  # 20220202190133
     price = Column(Float())  # 价格
     share = Column(Float())  # 股
+    broker_name = Column(String)  # 券商名字：通用(mock)、银河(yinhe)、国金....
 
-    def __init__(self, code, price, share, signal_date, trade_datetime, strategy):
+    def __init__(self, code, price, share, signal_date, trade_datetime, strategy,broker_name):
         self.code = code
         self.signal_date = signal_date
         self.price = price
         self.share = share
         self.trade_datetime = trade_datetime
         self.strategy = strategy
+        self.broker_name = broker_name
 
     __table_args__ = (
         UniqueConstraint('code'),  # 持仓只能有一只股票

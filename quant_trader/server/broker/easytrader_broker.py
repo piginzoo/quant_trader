@@ -18,14 +18,16 @@ class EaseTraderBroker(Broker):
     def __init__(self):
         self.connect()
 
-    def connect(self):
+    def connect(self, current_broker_name):
         """
         重新连接到exe的进程上，如果此时已经登录了，就只会把它放置到前台；如果未登录，会先登录，然后放置到前台
         :return:
         """
-
-        current_broker_name = CONF['broker']['name']
-        # logger.info("当前使用的券商：%s", current_broker_name)
+        logger.info("切换至券商：%s", current_broker_name)
+        if CONF['brokers'].get(current_broker_name,None) is None:
+            msg = "股票执行任务提供的券商[%s]在配置文件中不存在，请检查配置，或者券商名" % current_broker_name
+            logger.error(msg)
+            raise ValueError(msg)
 
         uid = CONF['brokers'][current_broker_name]['uid']
         pwd = CONF['brokers'][current_broker_name]['pwd']

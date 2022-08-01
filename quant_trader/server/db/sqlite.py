@@ -31,9 +31,9 @@ def query_log():
     return session.query(TradeLog).all()
 
 
-def task(code, trade_type, price, share, signal_date, strategy):
+def task(code, trade_type, price, share, signal_date, strategy,broker_name):
     session = connect_database()
-    session.add(TradeTask(code, trade_type, price, share, signal_date, strategy))
+    session.add(TradeTask(code, trade_type, price, share, signal_date, strategy,broker_name))
     session.commit()
     logger.info("保存交易任务到db：%s股票%s，%d股，信号日期：%s", trade_type, code, share, signal_date)
 
@@ -101,7 +101,8 @@ def task_done(task, price=None, message='交易完成'):
                                            share=task.share,
                                            signal_date=task.signal_date,
                                            trade_datetime=utils.now(),
-                                           strategy=task.strategy)
+                                           strategy=task.strategy,
+                                           broker_name=task.broker_name)
             session.add(trade_position)
             logger.debug("更新买入信息，插入仓位表：%r", trade_position)
         # 处理仓位信息（卖）
