@@ -292,7 +292,7 @@ def verify():
      ------------使用示例一：验证回调URL---------------
      *企业开启回调模式时，企业号会向验证url发送一个get请求 
      假设点击验证时，企业收到类似请求：
-     * GET /cgi-bin/wxpush?msg_signature=5c45ff5e21c57e6ad56bac8758b79b1d9ac89fd3&timestamp=1409659589&nonce=263014780&echostr=P9nAzCzyDtyTWESHep1vC5X9xho%2FqYX3Zpb4yKa9SKld1DsH3Iyt3tP3zNdtp%2B4RPcs8TgAE7OaBO%2BFZXvnaqQ%3D%3D 
+     * GET /cgi-bin/wxpush?msg_signature=xxxxxxxx&timestamp=1409659589&nonce=263014780&echostr=xxxxxx 
      * HTTP/1.1 Host: qy.weixin.qq.com
      接收到该请求时，企业应	1.解析出Get请求的参数，包括消息体签名(msg_signature)，时间戳(timestamp)，随机数字串(nonce)以及企业微信推送过来的随机加密字符串(echostr),
      这一步注意作URL解码。
@@ -323,8 +323,8 @@ def verify():
 if __name__ == "__main__":
     # 假设企业在企业微信后台上设置的参数如下
     sToken = "piginzoo"
-    sEncodingAESKey = "47xH73J4KXsMnQJqEIuGBGshVNQBtY4Dk6Sh7wCr7St"
-    sCorpID = "ww75e6491407ca9fb3"
+    sEncodingAESKey = "xxxxxxx"
+    sCorpID = "yyyyyyyyy"
     '''
      ------------使用示例一：验证回调URL---------------
      *企业开启回调模式时，企业号会向验证url发送一个get请求 
