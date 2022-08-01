@@ -432,7 +432,7 @@ def is_trade_day():
 
 def is_trade_time():
     FMT = '%H:%M:%S'
-    now = datetime.strftime(datetime.now(), FMT)
+    now = datetime.datetime.strftime(datetime.datetime.now(), FMT)
     time_0930 = "09:30:00"
     time_1130 = "11:30:00"
     time_1300 = "13:00:00"
