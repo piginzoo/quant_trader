@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-from quant_trader.server.const import TRADE_BUY, TRADE_SELL, TRADE_BALANCE
+from quant_trader.server.const import TRADE_BUY, TRADE_SELL, TRADE_BALANCE, UNKNOWN
 from quant_trader.server.db.sqlite import query_task
 from quant_trader.server.scheduler.trade_buy_action import TradeBuyAction
 from quant_trader.server.scheduler.trade_sell_action import TradeSellAction
@@ -68,7 +68,7 @@ class TradeJob():
         task_results={}
         for task in tasks:
             if task.broker is None or task.broker=='':
-                task.broker = 'Unknown'
+                task.broker = UNKNOWN
             if task_results.get(task.broker,None) is None:
                 task_results[task.broker]=[task]
             else:

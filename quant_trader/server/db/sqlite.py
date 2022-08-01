@@ -111,6 +111,8 @@ def task_done(task, price=None, message='交易完成'):
             trade_positoin = session.query(TradePosition).filter(TradePosition.code == task.code).first()
             # 要从仓位表中，取得这个股票对应的策略!!!
             task.strategy = trade_positoin.strategy
+            # 卖出任务是没有券商信息的，要从仓位信息中获取!!!
+            task.broker_name = trade_positoin.broker_name
             # 然后，就可以删掉他了
             session.query(TradePosition).filter(TradePosition.code == task.code).delete()
             logger.debug("更新卖出信息，删除仓位表，通过股票代码: %s", task.code)

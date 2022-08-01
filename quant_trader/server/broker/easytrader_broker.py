@@ -1,7 +1,9 @@
 import logging
+import os.path
 import time
 import easytrader
 
+from quant_trader.server.const import UNKNOWN
 from quant_trader.utils import CONF, utils
 from quant_trader.server.broker.broker import Broker
 
@@ -24,7 +26,7 @@ class EaseTraderBroker(Broker):
         :return:
         """
         logger.info("切换至券商：%s", current_broker_name)
-        if CONF['brokers'].get(current_broker_name,None) is None:
+        if CONF['brokers'].get(current_broker_name, None) is None:
             msg = "股票执行任务提供的券商[%s]在配置文件中不存在，请检查配置，或者券商名" % current_broker_name
             logger.error(msg)
             raise ValueError(msg)
@@ -39,6 +41,21 @@ class EaseTraderBroker(Broker):
         self.client.prepare(user=uid, password=pwd, exe_path=exe_path)
         self.client.enable_type_keys_for_editor()
         # logger.info("登录了%s的%s类型客户端", current_broker_name, client_type)
+
+        # 保存一下当前的券商名，为了是，可以查询到当前的券商是谁
+        self.save_current_broker_name(current_broker_name)
+
+    def save_current_broker_name(self, current_broker_name):
+        if not os.path.exists("./data"):
+            os.mkdir("./data")
+        with open("./data/broker.name") as f:
+            f.write(current_broker_name)
+
+    def get_current_broker_name(self):
+        if not os.path.exists("./data/broker.name"): return UNKNOWN
+        with open("./data/broker.name") as f:
+            broker_name = f.read()
+            return broker_name
 
     def __format_code(self, code):
         """
