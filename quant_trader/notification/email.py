@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 import logging
 
-import notification
+from quant_trader import notification
 from quant_trader.utils import CONF
 
 logger = logging.getLogger(__name__)

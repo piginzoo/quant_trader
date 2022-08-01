@@ -17,9 +17,6 @@ class EaseTraderBroker(Broker):
     活动易的实现，未使用，有问题 
     """
 
-    def __init__(self):
-        self.connect()
-
     def connect(self, current_broker_name):
         """
         重新连接到exe的进程上，如果此时已经登录了，就只会把它放置到前台；如果未登录，会先登录，然后放置到前台

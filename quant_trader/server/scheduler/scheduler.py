@@ -51,11 +51,11 @@ def start_scheduler(broker):
         func=TradeJob(),
         args=[broker],
         trigger='interval',
-        minutes=CONF['scheduler']['client']['interval'],
+        minutes=CONF['scheduler']['trade']['interval'],
         max_instances=1,
         executor='threadpool',
     )
-    logger.debug("调度任务启动，时间间隔为：%s 分", CONF['scheduler']['client']['interval'])
+    logger.debug("调度任务启动，时间间隔为：%s 分", CONF['scheduler']['trade']['interval'])
 
     # 启动仓位同步调度器
     scheduler.add_job(
