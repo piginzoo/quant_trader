@@ -38,6 +38,39 @@
 pip install -r requirement.txt
 ```
 
+1、安装easytrader
+
+```
+git clone https://github.com/piginzoo/easytrader
+cd easytrader
+python setup.py install 
+```
+
+2、安装同花顺软件，并配置路径
+
+- 下载[同花顺](https://download.10jqka.com.cn/free/)，并安装
+- 配置[conf/config.yml]，并修改其中的配置：
+```yaml
+# 下单服务器支持的券商信息
+brokers:
+        yinhe: # 银河证券
+                uid: 'xxxxxxx'
+                pwd: 'yyyyyyy'
+                client_type: 'ths5.19'
+                exe_path: 'c:\software\ths\xiadan.exe'
+        mock: # 同花顺模拟炒股
+                uid: 'xxxxxxx'
+                pwd: 'yyyyyyy'
+                client_type: 'universal_client'
+                exe_path: 'c:\software\ths.mock\xiadan.exe'
+```
+其中不同券商的软件尽量分开（原因：银河证券登录框一旦激活，就无法切换到其他券商的登录框，所以要分开目录。）
+
+3、启动服务器：
+```batch
+bin\server.bat
+```
+
 # 开发日志
 
 这个用于记录一些比较tricky的开发日志
