@@ -252,6 +252,7 @@ class EaseTraderBroker(Broker):
 # python -m quant_trader.server.broker.easytrader_broker
 if __name__ == '__main__':
     utils.init_logger(simple=True)
+    print("测试模拟炒股")
     broker = EaseTraderBroker()
     broker.connect('mock')
     broker.balance()
@@ -263,7 +264,7 @@ if __name__ == '__main__':
     broker.today_trades()
     time.sleep(2)
     print("="*40)
-    print("=" * 40)
+    print("测试银河证券")
     broker.connect('yinhe')
     broker.balance()
     time.sleep(2)
