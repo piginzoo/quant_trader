@@ -13,55 +13,55 @@
 
 ## 测试查询头寸
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"balance"}'
 
 ## 测试查询仓位
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"position"}'
 
 ## 查询今日委托单
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"today_entrusts"}'
 
 ## 查询今日成交单
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"today_trades"}'
 
 
 ## 测试买申请：
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"buy","code":"600001.SH","share":100,"date":"20220612"}'
 
 ## 测试卖申请：
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"sell","code":"600001.SH","share":100,"date":"20220612"}'
 
 ## 测试立刻买
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"buy_now","code":"600002.SH","share":100}'
 
 ## 测试立刻卖
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"sell_now","code":"600002.SH","share":100}'
 
 ## 测试立刻撤单
 
-curl -X POST http://39.105.16.106:8888/api?token=dapenti@piginzoo.com \
+curl -X POST http://127.0.0.1:8888/api?token=your_token \
 -H 'Content-Type: application/json' \
 -d '{"action":"cancel","entrust_no":2886312418}'

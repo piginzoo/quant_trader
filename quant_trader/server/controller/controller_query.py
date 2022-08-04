@@ -15,7 +15,6 @@ app = Blueprint('query', __name__, url_prefix="/")
 此controller仅用于html页面导航，真正的各种action操作，都转移到controller_api里面去了（json api）
 """
 
-# http://39.105.16.106:8888/query/action=position&token=dapenti@piginzoo
 @app.route('query', methods=["GET"])
 def query():
 
