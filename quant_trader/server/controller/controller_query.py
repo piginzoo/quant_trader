@@ -21,7 +21,7 @@ def query():
 
     token = request.args.get('token', None)
     action = request.args.get('action', None)
-    broker = request.args.get('broker', None)
+    broker_name = request.args.get('broker', None)
 
     # 加一个安全限制
     if token is None or token != CONF['broker_server']['token']:
@@ -38,6 +38,7 @@ def query():
     # 查询真实软件信息
     if action == "balance":
         _broker = broker.get("easytrader")
+        _broker.connect(broker_name)
         return render_template('item.html', data=_broker.balance(), title="头寸情况")
 
     if action:
