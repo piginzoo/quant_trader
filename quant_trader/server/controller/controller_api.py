@@ -136,8 +136,8 @@ def api():
 
         # 立刻撤单，主要用于测试用
         if action == TRADE_CANCEL:
-            entrust_no = request.args.get['entrust_no']
-            broker_name = request.args.get['broker']
+            entrust_no = request.args.get('entrust_no')
+            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             msg = __broker.cancel(entrust_no)
@@ -146,28 +146,28 @@ def api():
 
         # 查询真实仓位
         if action == TRADE_TRUE_POSITION:
-            broker_name = request.args.get['broker']
+            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '真实仓位', 'msg': 'ok', 'data': __broker.position()}), 200
 
         # 查询头寸
         if action == TRADE_BALANCE:
-            broker_name = request.args.get['broker']
+            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '真实头寸', 'msg': 'ok', 'data': __broker.balance()}), 200
 
         # 查询当日委托
         if action == TRADE_TODAY_ENTRUSTS:
-            broker_name = request.args.get['broker']
+            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '当日委托', 'msg': 'ok', 'data': __broker.today_entrusts()}), 200
 
         # 查询当日成交
         if action == TRADE_TODAY_TRADES:
-            broker_name = request.args.get['broker']
+            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '当日成交', 'msg': 'ok', 'data': __broker.today_trades()}), 200
