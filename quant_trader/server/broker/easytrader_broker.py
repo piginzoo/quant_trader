@@ -124,6 +124,13 @@ class EaseTraderBroker(Broker):
 
     def balance(self):
         balance = self.client.balance
+
+        # 银河证券会返回一个数组，她的balance不在是用静态标签表示了，而是用grid，但是只有一行
+        if type(balance)==list:
+            logger.debug("返回的balance头寸数据为数组：%d 行",len(balance))
+            if len(balance)>0:
+                balance = balance[0]
+
         logger.info("头寸：%r", balance)
         return balance
 
