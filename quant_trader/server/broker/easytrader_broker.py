@@ -35,7 +35,10 @@ class EaseTraderBroker(Broker):
         # logger.info("券商使用的账户：uid=%s, pwd=%s, client_type=%s, exe_path=%s", uid, pwd[:2] + "****", client_type, exe_path)
 
         self.client = easytrader.use(client_type)
+
+        # 登录客户端，输入用户名和密码
         self.client.prepare(user=uid, password=pwd, exe_path=exe_path)
+
         self.client.enable_type_keys_for_editor()
         # logger.info("登录了%s的%s类型客户端", current_broker_name, client_type)
 
@@ -242,8 +245,8 @@ class EaseTraderBroker(Broker):
 # python -m server.broker.easytrader_broker
 if __name__ == '__main__':
     utils.init_logger(simple=True)
-    EaseTraderBroker().balance()
-    EaseTraderBroker().buy("600001", 100)
-    EaseTraderBroker().sell("600001", 100)
-    EaseTraderBroker().sell("600002", 100)
-    EaseTraderBroker().cancel("600002", 100)
+    broker = EaseTraderBroker()
+    broker.connect('mock')
+    broker.balance()
+    broker.connect('yinhe')
+    broker.balance()
