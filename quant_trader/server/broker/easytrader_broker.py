@@ -45,7 +45,7 @@ class EaseTraderBroker(Broker):
     def save_current_broker_name(self, current_broker_name):
         if not os.path.exists("./data"):
             os.mkdir("./data")
-        with open("./data/broker.name") as f:
+        with open("./data/broker.name","w") as f:
             f.write(current_broker_name)
 
     def get_current_broker_name(self):
