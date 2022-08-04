@@ -4,8 +4,7 @@ from sqlalchemy import Column, Integer, String, Float, UniqueConstraint
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
-import conf
-from quant_trader.utils import utils
+from quant_trader.utils import utils, conf
 
 Base = declarative_base()
 
