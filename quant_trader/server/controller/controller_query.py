@@ -18,15 +18,17 @@ app = Blueprint('query', __name__, url_prefix="/")
 # http://39.105.16.106:8888/query/action=position&token=dapenti@piginzoo
 @app.route('query', methods=["GET"])
 def query():
+
     token = request.args.get('token', None)
+    action = request.args.get('action', None)
+    broker = request.args.get('broker', None)
+
     # 加一个安全限制
     if token is None or token != CONF['broker_server']['token']:
         logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
         return "无效的访问", 400
 
-    action = request.args.get('action', None)
-
-    query_url = f"/api?action={action}&token={token}"
+    query_url = f"/api?action={action}&token={token}&broker={broker}"
 
     if action == "task":
         delete_url = f"/api?action=del_task&token={token}"

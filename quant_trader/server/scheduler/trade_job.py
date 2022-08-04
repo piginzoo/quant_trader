@@ -34,6 +34,7 @@ class TradeJob():
             logger.exception('检索任务失败')
             return
 
+        # 对任务进行排序，这样分出不同的broker（券商）来
         task_dict = self.order_by_broker(tasks)
         for broker_name,broker_tasks in task_dict.items():
 

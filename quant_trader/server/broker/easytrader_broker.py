@@ -100,31 +100,26 @@ class EaseTraderBroker(Broker):
             raise ValueError(msg)
 
     def position(self):
-        self.connect()
         postion = self.client.position
         # logger.debug("仓位：\n%r", [f"{p['证券代码']}/{p['证券名称']}:{p['股票余额']}\n" for p in postion])
         return postion
 
     def balance(self):
-        self.connect()
         balance = self.client.balance
         logger.info("头寸：%r", balance)
         return balance
 
     def today_entrusts(self):
-        self.connect()
         entrusts = self.client.today_entrusts
         # logger.debug("委托：\n%r", [f"{p['证券代码']}/{p['证券名称']}/{p['操作']}:{p['委托数量']},  " for p in entrusts])
         return entrusts
 
     def today_trades(self):
-        self.connect()
         trades = self.client.today_trades
         # logger.debug("委托：\n%r", [f"{p['证券代码']}/{p['证券名称']}/{p['操作']}:{p['成交数量']},  " for p in trades])
         return trades
 
     def balance(self):
-        self.connect()
         balance = self.client.balance
         logger.info("头寸：%r", balance)
         return balance
@@ -133,7 +128,6 @@ class EaseTraderBroker(Broker):
         """
         撤单：entrust_no，委托单号
         """
-        self.connect()
         msg = self.client.cancel_entrust(entrust_no)  # 返回：{'message': '撤单申报成功'}
         return msg['message']
 
