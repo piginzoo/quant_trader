@@ -242,11 +242,13 @@ class EaseTraderBroker(Broker):
         return None
 
 
-# python -m server.broker.easytrader_broker
+# python -m quant_trader.server.broker.easytrader_broker
 if __name__ == '__main__':
     utils.init_logger(simple=True)
     broker = EaseTraderBroker()
     broker.connect('mock')
     broker.balance()
+    print("="*40)
+    print("=" * 40)
     broker.connect('yinhe')
     broker.balance()
