@@ -41,6 +41,6 @@ def query():
         return render_template('item.html', data=_broker.balance(), title="头寸情况",token=token)
 
     if action:
-        return render_template('table.html', query_url=query_url)
+        return render_template('table.html', query_url=query_url,token=token)
     else:
-        return render_template('index.html')
+        return render_template('index.html',token=token)
