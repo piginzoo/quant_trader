@@ -38,7 +38,7 @@ def query():
     if action == "balance":
         _broker = broker.get("easytrader")
         _broker.connect(broker_name)
-        return render_template('item.html', data=_broker.balance(), title="头寸情况")
+        return render_template('item.html', data=_broker.balance(), title="头寸情况",token=token)
 
     if action:
         return render_template('table.html', query_url=query_url)
