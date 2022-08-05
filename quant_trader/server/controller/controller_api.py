@@ -173,7 +173,7 @@ def api():
             return jsonify({'code': 0, 'title': '当日成交', 'msg': 'ok', 'data': __broker.today_trades()}), 200
 
         logger.error("无效的访问参数：%r", request.args.get)
-        return jsonify({'code': -1, 'msg': f'Invalid request:{request.get_data()}'}), 200
+        return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200
     except Exception as e:
         logger.exception("处理过程中出现问题：%r", e)
         return jsonify({'code': -1, 'msg': f'Exception happened: {str(e)}'}), 200

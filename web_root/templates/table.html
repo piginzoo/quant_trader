@@ -17,6 +17,11 @@
                         url: '{{ query_url | safe }}',
                         type: 'get',
                         success: function (json_data) {
+                            if (json_data.code!=0){
+                                $('#title').html("错误发生："+json_data.msg);
+                                return;
+                            }
+
                             $('#title').html(json_data.title);
                             create_table(json_data.data, '#table');
                         },
