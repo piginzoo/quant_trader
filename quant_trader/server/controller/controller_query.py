@@ -32,7 +32,7 @@ def query():
     if action == "task":
         delete_url = f"/api?action=del_task&token={token}"
         complete_url = f"/api?action=complete_task&token={token}"
-        return render_template('table.html', query_url=query_url, delete_url=delete_url, complete_url=complete_url)
+        return render_template('table.html', query_url=query_url, delete_url=delete_url, complete_url=complete_url,token=token)
 
     # 查询真实软件信息
     if action == "balance":
