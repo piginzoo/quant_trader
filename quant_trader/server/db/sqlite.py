@@ -52,23 +52,23 @@ def del_position(position):
     logger.info("从数据库[TradePostion表]中删除了股票[%s]的仓位", position.code)
 
 
-def query_task(code=None, id=None):
+def query_task(broker_name, code=None, id=None):
     session = connect_database()
     if code:
         return session.query(TradeTask).filter(TradeTask.code == code).first()
     if id:
         return session.query(TradeTask).filter(TradeTask.id == id).first()
-    return session.query(TradeTask).all()
+    return session.query(TradeTask).filter(TradeTask.broker_name == broker_name).all()
 
 
-def query_position():
+def query_position(broker_name):
     session = connect_database()
-    return session.query(TradePosition).all()
+    return session.query(TradePosition).filter(TradePosition.broker_name == broker_name).all()
 
 
-def query_log():
+def query_log(broker_name):
     session = connect_database()
-    return session.query(TradeLog).all()
+    return session.query(TradeLog).filter(TradeLog.broker_name == broker_name).all()
 
 
 def task_archieve(task_id, status, message):

@@ -51,21 +51,24 @@ def api():
             logger.warning("请求不合法:未包含action，不知道你要干啥？")
             return jsonify({'code': -1, 'msg': f'action is not set, invalid call'}), 200
 
-        logger.debug("获得请求的Action：%s", action)
-
+        broker_name = request.args.get('broker', None)
+        logger.debug("获得请求的Action：%s,Broker: %r", action, broker_name)
 
         # 查询未完成任务
         if action == "task":
             return jsonify(
-                {'code': 0, 'title': '未完成交易', 'msg': 'ok', 'data': [t.to_dict() for t in sqlite.query_task()]}), 200
+                {'code': 0, 'title': '未完成交易', 'msg': 'ok',
+                 'data': [t.to_dict() for t in sqlite.query_task(broker_name)]}), 200
         # 查询交易日志
         if action == "log":
             return jsonify(
-                {'code': 0, 'title': '交易日志', 'msg': 'ok', 'data': [t.to_dict() for t in sqlite.query_log()]}), 200
+                {'code': 0, 'title': '交易日志', 'msg': 'ok',
+                 'data': [t.to_dict() for t in sqlite.query_logbroker_name()]}), 200
         # 查询逻辑仓位
         if action == TRADE_POSITION:
             return jsonify(
-                {'code': 0, 'title': '记录仓位', 'msg': 'ok', 'data': [t.to_dict() for t in sqlite.query_position()]}), 200
+                {'code': 0, 'title': '记录仓位', 'msg': 'ok',
+                 'data': [t.to_dict() for t in sqlite.query_position(broker_name)]}), 200
 
         # 删除僵尸任务（就是怎么执行都执行不了，用于错误恢复）
         if action == "del_task":
@@ -89,7 +92,7 @@ def api():
             # 卖的时候，price和策略都未定义
             price = params.get('price', -1)  # 卖出没有价格字段，赋值为-1
             strategy = params.get('strategy', '')  # 卖出没有策略字段，赋值为''
-            broker_name = params.get('broker_name','')  # 卖出没有券商字段，赋值为''
+            broker_name = params.get('broker_name', '')  # 卖出没有券商字段，赋值为''
 
             if len(sqlite.query_task(code)) > 0:
                 logger.warning("股票[%s]的买卖请求[%s]已经存在", code, action)
@@ -102,7 +105,7 @@ def api():
             notifier.notify(msg, INFO)
 
             # 将买卖任务，插入到任务表中
-            sqlite.task(code, action, price, share, signal_date, strategy,broker_name)
+            sqlite.task(code, action, price, share, signal_date, strategy, broker_name)
             return jsonify({'code': 0, 'msg': f'{action} data save to server'}), 200
 
         # 立刻买入，主要用于测试用
@@ -137,7 +140,7 @@ def api():
         # 立刻撤单，主要用于测试用
         if action == TRADE_CANCEL:
             entrust_no = request.args.get('entrust_no')
-            broker_name = request.args.get('broker')
+
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             msg = __broker.cancel(entrust_no)
@@ -146,28 +149,24 @@ def api():
 
         # 查询真实仓位
         if action == TRADE_TRUE_POSITION:
-            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '真实仓位', 'msg': 'ok', 'data': __broker.position()}), 200
 
         # 查询头寸
         if action == TRADE_BALANCE:
-            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '真实头寸', 'msg': 'ok', 'data': __broker.balance()}), 200
 
         # 查询当日委托
         if action == TRADE_TODAY_ENTRUSTS:
-            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '当日委托', 'msg': 'ok', 'data': __broker.today_entrusts()}), 200
 
         # 查询当日成交
         if action == TRADE_TODAY_TRADES:
-            broker_name = request.args.get('broker')
             __broker = broker.get("easytrader")
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '当日成交', 'msg': 'ok', 'data': __broker.today_trades()}), 200

@@ -17,30 +17,6 @@
 <div class="container-fluid container-panel">
     <div class="card-header">
         <i class="fa fa-database" aria-hidden="true">功能</i>
-    </div>
-
-    <div class="card">
-        <h2> 查看数据库 </h2>
-        <ul class="list-group">
-            <li class=" list-group-item alert-primary" role="alert" align="center">
-                <a href="/query?action=position&token={{token}}"
-                   class="btn btn-block btn-big btn-primary vcenter">当前持仓</a>
-            </li>
-
-            <li class="list-group-item alert alert-primary" role="alert" align="center">
-                <a href="/query?action=task&token={{token}}"
-                   class="btn btn-block btn-big btn-primary vcenter">待交易任务</a>
-            </li>
-
-            <li class="list-group-item alert alert-primary" role="alert" align="center">
-                <a href="/query?action=log&token={{token}}"
-                   class="btn btn-block btn-big btn-primary vcenter">交易日志</a>
-            </li>
-
-            <ul/>
-    </div>
-    <div class="card">
-        <h2> 查看软件结果 </h2>
         <div class="form-group">
             <label class="col-sm-2 control-label">选择券商:</label>
             <div class="col-sm-offset-2 col-sm-12">
@@ -50,6 +26,30 @@
                 </select>
             </div>
         </div>
+    </div>
+
+    <div class="card">
+        <h2> 查看数据库 </h2>
+        <ul class="list-group">
+            <li class=" list-group-item alert-primary" role="alert" align="center">
+                <a href="#" onclick="submit_it('position')"
+                   class="btn btn-block btn-big btn-primary vcenter">当前持仓</a>
+            </li>
+
+            <li class="list-group-item alert alert-primary" role="alert" align="center">
+                <a href="#" onclick="submit_it('task')"
+                   class="btn btn-block btn-big btn-primary vcenter">待交易任务</a>
+            </li>
+
+            <li class="list-group-item alert alert-primary" role="alert" align="center">
+                <a href="#" onclick="submit_it('log')"
+                   class="btn btn-block btn-big btn-primary vcenter">交易日志</a>
+            </li>
+
+            <ul/>
+    </div>
+    <div class="card">
+        <h2> 查看软件结果 </h2>
         <ul class="list-group">
             <li class="list-group-item alert-primary" role="alert" align="center">
                 <a href="#" onclick="submit_it('true_position')"
