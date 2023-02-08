@@ -94,15 +94,16 @@ def startup(app):
     regist_blueprint(app)
     logger.info("注册完所有路由：\n %r", app.url_map)
 
-    __broker = broker.get("easytrader")
+    __broker = broker.get("qmt")
     __scheduler = scheduler.start_scheduler(__broker)
-    logger.debug("启动了使用Easytrader的调度器Scheduler")
+    logger.debug("启动了调度器Scheduler")
 
     # Shut down the scheduler when exiting the app
     atexit.register(shutdown, __scheduler)
     logger.info("服务器启动完成。")
 
-    app.run(host='0.0.0.0', port=CONF['broker_server']['port'],
+    app.run(host='0.0.0.0',
+            port=CONF['broker_server']['port'],
             use_reloader=False)  # use_reloader false是防止scheduler启动多次
     logger.info("系统启动完成，端口：%d", CONF['broker_server']['port'])
 

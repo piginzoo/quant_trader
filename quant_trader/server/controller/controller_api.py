@@ -171,8 +171,22 @@ def api():
             __broker.connect(broker_name)
             return jsonify({'code': 0, 'title': '当日成交', 'msg': 'ok', 'data': __broker.today_trades()}), 200
 
+        # heartbeat ，2023.2.8
+        """
+        做一个心跳，逻辑是，每次发送心跳过来，
+        如果没有心跳时间超过配置时间（半小时），就要报警了，
+        这个用于监控家里的机器是不是好的。
+        但是，不是所有的都会检测，所以需要一个配置表
+        """
+        if action == HEARTBEAT:
+            __broker = broker.get("qmt")
+            __broker.heartbeat(params['name'])
+            logger.debug("接收到心跳包：%s",params['name'])
+            return jsonify({'code': 0,'msg': 'ok'}),200
+
         logger.error("无效的访问参数：%r", request.args.get)
         return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200
+
     except Exception as e:
         logger.exception("处理过程中出现问题：%r", e)
         return jsonify({'code': -1, 'msg': f'Exception happened: {str(e)}'}), 200

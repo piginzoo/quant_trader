@@ -6,6 +6,7 @@ from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+from quant_trader.server.heartbeat.heartbeat_job import HeartbeatJob
 from quant_trader.utils import utils, CONF
 from quant_trader.server import broker
 from quant_trader.server.scheduler.position_sync_job import PositionSyncJob
@@ -46,26 +47,37 @@ def start_scheduler(broker):
     })
     logger.debug("创建调度器完成")
 
-    # 启动买卖调度器
+    # # 启动买卖调度器
+    # scheduler.add_job(
+    #     func=TradeJob(),
+    #     args=[broker],
+    #     trigger='interval',
+    #     minutes=CONF['scheduler']['trade']['interval'],
+    #     max_instances=1,
+    #     executor='threadpool',
+    # )
+    # logger.debug("调度任务启动，时间间隔为：%s 分", CONF['scheduler']['trade']['interval'])
+    #
+    # # 启动仓位同步调度器
+    # scheduler.add_job(
+    #     func=PositionSyncJob(),
+    #     args=[broker],
+    #     trigger=CronTrigger.from_crontab(CONF['scheduler']['position_sync']['cron']),
+    #     max_instances=1,
+    #     executor='threadpool',
+    # )
+    # logger.debug("调度任务启动，周期为（cron）：%s ", CONF['scheduler']['position_sync']['cron'])
+
+    # 启动心跳调度器
     scheduler.add_job(
-        func=TradeJob(),
+        func=HeartbeatJob(),
         args=[broker],
         trigger='interval',
-        minutes=CONF['scheduler']['trade']['interval'],
+        minutes=CONF['scheduler']['heartbeat']['interval'],
         max_instances=1,
         executor='threadpool',
     )
-    logger.debug("调度任务启动，时间间隔为：%s 分", CONF['scheduler']['trade']['interval'])
-
-    # 启动仓位同步调度器
-    scheduler.add_job(
-        func=PositionSyncJob(),
-        args=[broker],
-        trigger=CronTrigger.from_crontab(CONF['scheduler']['position_sync']['cron']),
-        max_instances=1,
-        executor='threadpool',
-    )
-    logger.debug("调度任务启动，周期为（cron）：%s ", CONF['scheduler']['position_sync']['cron'])
+    logger.debug("心跳调度任务启动，时间间隔为：%s 分", CONF['scheduler']['heartbeat']['interval'])
 
     scheduler.start()
     logger.info("启动了任务！主进程：%d", os.getpid())
