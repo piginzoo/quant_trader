@@ -1,10 +1,12 @@
 import datetime
 import time
 
-from quant_trader.utils import utils, CONF
+from quant_trader.utils import utils
 import logging
 
 logger = logging.getLogger(__name__)
+
+
 
 
 def run():
