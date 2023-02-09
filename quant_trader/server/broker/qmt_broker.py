@@ -15,8 +15,12 @@ class QMTBroker(Broker):
 
     def __init__(self):
         self.last_active_datetime = {}
+        self.server_status = {}  # online | offline
 
-    def heartbeat(self,name):
+    def heartbeat(self, name):
         now = beijing_time()
         # 更新最后更新时间
         self.last_active_datetime[name] = now
+
+    def set_status(self, name, status):
+        self.server_status[name] = status

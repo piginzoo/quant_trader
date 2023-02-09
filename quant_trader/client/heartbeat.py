@@ -18,7 +18,6 @@ def run():
             utils.http_json_post(full_url,{"action": "heartbeat","name": "etf"}) # name是为了标识系统
         except Exception:
             logger.exception("发送[ETF]心跳失败")
-            continue
 
         # logger.info("发送[ETF]心跳完成：%s",datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d %H:%M:%S"))
         time.sleep(60) # 写死了，懒得再写配置了

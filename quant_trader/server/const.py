@@ -15,5 +15,6 @@ TRADE_TRUE_POSITION = "true_position" # 查看真实持仓
 TRADE_POSITION = "position" # 查看持仓
 TRADE_CANCEL = "cancel" # 取消订单
 HEARTBEAT = "heartbeat" # 心跳💓
+HEARTBEAT_QUERY = "heartbeat_query"
 
 UNKNOWN = 'Unknown'

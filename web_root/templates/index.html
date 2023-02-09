@@ -5,12 +5,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script>
         function submit_it(action){
             var broker = document.getElementById("broker").value;
             href="/query?action="+action+"&broker="+broker+"&token={{token}}";
             window.location.href = href;
         }
+
+        $(document).ready(function(){
+             $.ajax({
+                url: '/api?action=heartbeat_query&name=etf&token={{token}}',
+                type: 'get',
+                success: function (json_data) {
+                    // console.log(json_data)
+                    $('#status').html(json_data['status'])
+                    $('#lastime').html(json_data['lastime'])
+
+                    if (json_data.status=='online'){
+                        $('#lastime_box').removeClass('alert-danger')
+                        $('#lastime_box').addClass('alert-success')
+                    }else{
+                        $('#lastime_box').removeClass('alert-success')
+                        $('#lastime_box').addClass('alert-danger')
+                    }
+                },
+                error: function (res) {
+                    console.log("错误发生：")
+                    console.log(res)
+                }
+             });
+        });
     </script>
 </head>
 <body>
@@ -27,7 +52,15 @@
             </div>
         </div>
     </div>
-
+    <div class="card">
+        <h2> 查看服务器 </h2>
+        <ul class="list-group">
+            <li class=" list-group-item alert-primary" role="alert" align="center">
+                <div class="alert alert-success" role="alert" id="lastime_box">
+                    状态：<span id="status"></span>，最后时间：<span id="lastime"></span></div>
+            </li>
+        <ul/>
+    </div>
     <div class="card">
         <h2> 查看数据库 </h2>
         <ul class="list-group">

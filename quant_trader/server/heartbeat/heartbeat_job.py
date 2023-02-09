@@ -14,6 +14,6 @@ class HeartbeatJob():
 
         # 不在交易日和交易时间，就返回
         try:
-            monitor.handle(broker.last_active_datetime)
+            monitor.handle(broker)
         except:  # 防止tushare调用异常
             logger.exception('心跳调度异常')

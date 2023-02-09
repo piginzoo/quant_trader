@@ -45,7 +45,8 @@ def get_heartbeat_conf(name):
     return None
 
 
-def handle(last_active_datetime: dict):
+def handle(broker):
+    last_active_datetime = broker.last_active_datetime
     # 非交易日不检查
     if not is_trade_day(datetime.datetime.now()):
         logger.debug("今日不是交易日")
@@ -58,10 +59,11 @@ def handle(last_active_datetime: dict):
         name = heartbeat['name']
         # 看看缓存的上次更新时间
         lastime = last_active_datetime.get(name, None)
-        # 如果是第一次，就仅记录下
+        # 如果是第一次，记录一个起始时间
         if lastime is None:
+            # 先记录一下时间戳，用于下次算
             last_active_datetime[name] = now
-            logger.debug("第一次记录心跳时间")
+            logger.debug("开启[%s]心跳的监控",name)
             continue
 
         check_time = heartbeat['check_time'].split("~")  # 9:30~15:00
@@ -73,17 +75,16 @@ def handle(last_active_datetime: dict):
         # 如果不在交易时间，就返回
         if now < begin_time or now > end_time:
             logger.debug("现在[%s]不是交易时间", date2str(now))
-            # continue
+            continue
 
         # 看看上次缓存时间是不是超过timeout（默认30分钟），如果是，发通知
         timeout = heartbeat['timeout']
 
+        # 超时了
         if abs(now - lastime) > datetime.timedelta(minutes=timeout):
-            # notifier.notify('服务[%s]超时：超时时间[%.0f]分 > 规定时间[%.0f]', ERROR, now - lastime, timeout)
-            # 然后把最后更新时间改为现在
-            last_active_datetime[name] = now
-            print(f"{name}超时了")
+            broker.server_status = 'offline'
+            notifier.notify(f'服务[{name}]超时：超时时间[{now - lastime}]分 大于 规定时间[{timeout}]', ERROR)
             continue
 
-    logger.debug("[%s]心跳正常", name)
+        logger.debug("[%s]心跳正常", name)
     return True

@@ -15,7 +15,7 @@ from quant_trader.server.db import sqlite
 logger = logging.getLogger(__name__)
 
 app = Blueprint('api', __name__, url_prefix="/")
-
+qmt_broker = broker.get("qmt")
 
 def request2json(request):
     logger.debug("Got json data:%d bytes", len(request))
@@ -179,10 +179,21 @@ def api():
         但是，不是所有的都会检测，所以需要一个配置表
         """
         if action == HEARTBEAT:
-            __broker = broker.get("qmt")
-            __broker.heartbeat(params['name'])
+
+            qmt_broker.heartbeat(params['name'])
+            qmt_broker.set_status(params['name'],'online')
             logger.debug("接收到心跳包：%s",params['name'])
             return jsonify({'code': 0,'msg': 'ok'}),200
+
+        if action == HEARTBEAT_QUERY:
+            name = request.args.get('name')
+            lastime = qmt_broker.last_active_datetime.get(name,None)
+            status = qmt_broker.server_status.get(name, None)
+            logger.debug("查询[%s]心跳结果：最后更新时间：%r，状态：%r",name,lastime,status)
+            if status is None:
+                return jsonify({'code': 0,'lastime': 'N/A','status':'N/A' }),200
+            else:
+                return jsonify({'code': 0,'lastime': lastime,'status':status }),200
 
         logger.error("无效的访问参数：%r", request.args.get)
         return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200
