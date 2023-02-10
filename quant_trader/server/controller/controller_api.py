@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import datetime
 import json
 import logging
 from json import JSONDecodeError
@@ -190,10 +191,11 @@ def api():
             lastime = qmt_broker.last_active_datetime.get(name,None)
             status = qmt_broker.server_status.get(name, None)
             logger.debug("查询[%s]心跳结果：最后更新时间：%r，状态：%r",name,lastime,status)
-            if status is None:
-                return jsonify({'code': 0,'lastime': 'N/A','status':'N/A' }),200
-            else:
-                return jsonify({'code': 0,'lastime': lastime,'status':status }),200
+            s_lastime = 'N/A'
+            s_status = 'N/A'
+            if lastime: s_lastime = datetime.datetime.strftime(lastime,"%Y-%m-%d %H:%M:%S")
+            if status: s_status = status
+            return jsonify({'code': 0,'lastime': s_lastime,'status':s_status }),200
 
         logger.error("无效的访问参数：%r", request.args.get)
         return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200
