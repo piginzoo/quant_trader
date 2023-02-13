@@ -7,16 +7,15 @@ from json import JSONDecodeError
 
 from flask import Blueprint, jsonify, request
 
-from quant_trader.notification import INFO, notifier
-from quant_trader.utils import CONF
 from quant_trader.server import broker
 from quant_trader.server.const import *
-from quant_trader.server.db import sqlite
+from quant_trader.utils import CONF, utils
 
 logger = logging.getLogger(__name__)
 
 app = Blueprint('api', __name__, url_prefix="/")
 qmt_broker = broker.get("qmt")
+
 
 def request2json(request):
     logger.debug("Got json data:%d bytes", len(request))
@@ -35,11 +34,11 @@ def request2json(request):
 @app.route('api', methods=["GET", "POST"])
 def api():
     try:
-        token = request.args.get('token', None)
-        # 加一个安全限制
-        if token is None or token != CONF['broker_server']['token']:
-            logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
-            return "无效的访问1", 400
+        # token = request.args.get('token', None)
+        # # 加一个安全限制
+        # if token is None or token != CONF['broker_server']['token']:
+        #     logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
+        #     return "无效的访问1", 400
 
         params = request2json(request.get_data())
 
@@ -55,122 +54,25 @@ def api():
         broker_name = request.args.get('broker', None)
         logger.debug("获得请求的Action：%s,Broker: %r", action, broker_name)
 
-        # 查询未完成任务
-        if action == "task":
+        if action == QERUY_QMT:
+            accounts = utils.unserialize("data/accounts.json")
+            positions = utils.unserialize("data/positions.json")
+            deals = utils.unserialize("data/deals.json")
             return jsonify(
-                {'code': 0, 'title': '未完成交易', 'msg': 'ok',
-                 'data': [t.to_dict() for t in sqlite.query_task(broker_name)]}), 200
-        # 查询交易日志
-        if action == "log":
+                {'code': 0,
+                 'msg': 'ok',
+                 'title': 'QMT信息',
+                 'data': [
+                     {'title': 'accounts', 'table':  accounts if accounts else []},
+                     {'tile': 'positions', 'table':  positions if positions else []},
+                     {'title': 'deals', 'table': deals if deals else []}
+                 ]
+                 }), 200
+            # [{'测试1':11,'测试2':12},{'测试1':21,'测试2':22}]}]
+
+        if action == QERUY_SERVER:
             return jsonify(
-                {'code': 0, 'title': '交易日志', 'msg': 'ok',
-                 'data': [t.to_dict() for t in sqlite.query_logbroker_name()]}), 200
-        # 查询逻辑仓位
-        if action == TRADE_POSITION:
-            return jsonify(
-                {'code': 0, 'title': '记录仓位', 'msg': 'ok',
-                 'data': [t.to_dict() for t in sqlite.query_position(broker_name)]}), 200
-
-        # 删除僵尸任务（就是怎么执行都执行不了，用于错误恢复）
-        if action == "del_task":
-            id = request.args.get('id')
-            sqlite.task_archieve(id, TRADE_STATUS_DELETE, '删除归档任务')
-            return jsonify({'code': 0, 'msg': 'ok'}), 200
-
-        # 手工完成任务（用于完成僵尸任务，就是怎么完成也完成不了，用于恢复错误）TODO: 价格呢？应该去同花顺的持仓中[成本价]尝试读一下，未来改进吧
-        if action == "complete_task":
-            id = request.args.get('id')
-            task = sqlite.query_task(id=id)
-            sqlite.task_done(task, message='手工完成任务')
-            return jsonify({'code': 0, 'msg': 'ok'}), 200
-
-        # 提交买卖请求，保存到数据库，等着调度器调度
-        if action == TRADE_BUY or action == TRADE_SELL:
-            code = params['code']
-            share = params['share']
-            signal_date = params['signal_date']
-
-            # 卖的时候，price和策略都未定义
-            price = params.get('price', -1)  # 卖出没有价格字段，赋值为-1
-            strategy = params.get('strategy', '')  # 卖出没有策略字段，赋值为''
-            broker_name = params.get('broker_name', '')  # 卖出没有券商字段，赋值为''
-
-            if len(sqlite.query_task(code)) > 0:
-                logger.warning("股票[%s]的买卖请求[%s]已经存在", code, action)
-                return jsonify(
-                    {'code': -1, 'msg': f'{code}\'s {action} save action fail, for it already existed in db'}), 200
-
-            # 买入/卖出信号通知
-            msg = "股票[%s]的[%s]信号：股数[%d]，信号日期[%s]" % (code, action, share, signal_date)
-            logger.info(msg)
-            notifier.notify(msg, INFO)
-
-            # 将买卖任务，插入到任务表中
-            sqlite.task(code, action, price, share, signal_date, strategy, broker_name)
-            return jsonify({'code': 0, 'msg': f'{action} data save to server'}), 200
-
-        # 立刻买入，主要用于测试用
-        if action == TRADE_BUY_NOW:
-            code = params['code']
-            share = params['share']
-
-            # 创建交易代理
-            __broker = broker.get("easytrader")
-            entrust_no = __broker.buy(code, share)
-
-            msg = "买股票[%s]请求，股数[%d]" % (code, share)
-            logger.info(msg)
-            notifier.notify(msg, INFO)
-
-            return jsonify({'code': 0, 'msg': f'buy stock[{code}] , amount:{share}, entrust_no:{entrust_no} '}), 200
-
-        # 立刻卖出，用于测试
-        if action == TRADE_SELL_NOW:
-            code = params['code']
-            share = params('share', None)
-            if share is None: share = 100
-            __broker = broker.get("easytrader")
-            entrust_no = __broker.sell(code, share)
-
-            msg = "卖股票[%s]请求，股数[%d]" % (code, share)
-            logger.info(msg)
-            notifier.notify(msg, INFO)
-
-            return jsonify({'code': 0, 'msg': f'sell stock[{code}] , amount:{share},  entrust_no:{entrust_no}  '}), 200
-
-        # 立刻撤单，主要用于测试用
-        if action == TRADE_CANCEL:
-            entrust_no = request.args.get('entrust_no')
-
-            __broker = broker.get("easytrader")
-            __broker.connect(broker_name)
-            msg = __broker.cancel(entrust_no)
-            logger.info("撤单返回结果：%s", msg)
-            return jsonify({'code': 0, 'msg': f'cancel entrust_no[{entrust_no}] finished， message:{msg}'}), 200
-
-        # 查询真实仓位
-        if action == TRADE_TRUE_POSITION:
-            __broker = broker.get("easytrader")
-            __broker.connect(broker_name)
-            return jsonify({'code': 0, 'title': '真实仓位', 'msg': 'ok', 'data': __broker.position()}), 200
-
-        # 查询头寸
-        if action == TRADE_BALANCE:
-            __broker = broker.get("easytrader")
-            __broker.connect(broker_name)
-            return jsonify({'code': 0, 'title': '真实头寸', 'msg': 'ok', 'data': __broker.balance()}), 200
-
-        # 查询当日委托
-        if action == TRADE_TODAY_ENTRUSTS:
-            __broker = broker.get("easytrader")
-            __broker.connect(broker_name)
-            return jsonify({'code': 0, 'title': '当日委托', 'msg': 'ok', 'data': __broker.today_entrusts()}), 200
-
-        # 查询当日成交
-        if action == TRADE_TODAY_TRADES:
-            __broker = broker.get("easytrader")
-            __broker.connect(broker_name)
-            return jsonify({'code': 0, 'title': '当日成交', 'msg': 'ok', 'data': __broker.today_trades()}), 200
+                {'code': 0, 'msg': 'ok'}), 200
 
         # heartbeat ，2023.2.8
         """
@@ -180,22 +82,57 @@ def api():
         但是，不是所有的都会检测，所以需要一个配置表
         """
         if action == HEARTBEAT:
-
             qmt_broker.heartbeat(params['name'])
-            qmt_broker.set_status(params['name'],'online')
-            logger.debug("接收到心跳包：%s",params['name'])
-            return jsonify({'code': 0,'msg': 'ok'}),200
+            qmt_broker.set_status(params['name'], 'online')
+            logger.debug("接收到心跳包：%s", params['name'])
 
+            if params['name'] == 'heartbeat':
+                """
+                {'action': 'heartbeat',
+                 'name': 'hearbeat',
+                 'info': [
+                     {'name':'accounts', 'data':get_accounts()},
+                     {'name':'positions', 'data':get_positions()},
+                     {'name':'deals', 'data':get_deals()}
+                ]}                
+                """
+                for i in params['info']:
+                    file_name = f"data/{i['name']}.json"
+                    uitls.serialize(i['data'], file_name)
+                    logger.debug("数据保存到：%s", file_name)
+
+            return jsonify({'code': 0, 'msg': 'ok'}), 200
+
+        """
+        查询用，用于返回给网页上信息
+        """
         if action == HEARTBEAT_QUERY:
             name = request.args.get('name')
-            lastime = qmt_broker.last_active_datetime.get(name,None)
+            lastime = qmt_broker.last_active_datetime.get(name, None)
             status = qmt_broker.server_status.get(name, None)
-            logger.debug("查询[%s]心跳结果：最后更新时间：%r，状态：%r",name,lastime,status)
+            logger.debug("查询[%s]心跳结果：最后更新时间：%r，状态：%r", name, lastime, status)
             s_lastime = 'N/A'
             s_status = 'N/A'
-            if lastime: s_lastime = datetime.datetime.strftime(lastime,"%Y-%m-%d %H:%M:%S")
+            if lastime: s_lastime = datetime.datetime.strftime(lastime, "%Y-%m-%d %H:%M:%S")
             if status: s_status = status
-            return jsonify({'code': 0,'lastime': s_lastime,'status':s_status }),200
+            return jsonify({'code': 0, 'lastime': s_lastime, 'status': s_status}), 200
+
+        logger.error("无效的访问参数：%r", request.args.get)
+        return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200
+
+        """
+        查询用，用于返回给网页上信息
+        """
+        if action == TRADE_DETAIL:
+            name = request.args.get('name')
+            lastime = qmt_broker.last_active_datetime.get(name, None)
+            status = qmt_broker.server_status.get(name, None)
+            logger.debug("查询[%s]心跳结果：最后更新时间：%r，状态：%r", name, lastime, status)
+            s_lastime = 'N/A'
+            s_status = 'N/A'
+            if lastime: s_lastime = datetime.datetime.strftime(lastime, "%Y-%m-%d %H:%M:%S")
+            if status: s_status = status
+            return jsonify({'code': 0, 'lastime': s_lastime, 'status': s_status}), 200
 
         logger.error("无效的访问参数：%r", request.args.get)
         return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200

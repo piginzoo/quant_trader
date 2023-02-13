@@ -6,7 +6,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
+trade_log= 'c:\\workspace\\iquant\\history\\transaction.csv'  # 交易记录
+last_grid_position= 'c:\\workspace\\iquant\\history\\last_grid_position.json'  # 最后的日期
 
 
 def run():
@@ -17,7 +18,17 @@ def run():
     while True:
         try:
             full_url = utils.get_url()
-            utils.http_json_post(full_url,{"action": "heartbeat","name": "etf"}) # name是为了标识系统
+            utils.http_json_post(
+                full_url,
+                {
+                    "action": "heartbeat",
+                    "name": "etf"},
+                files = {
+                  "field1" : ("transaction.csv", open(trade_log, "r")),
+                  "field2" : ("last_grid_position.json", open(last_grid_position, "r")),
+                }
+            ) # name是为了标识系统
+
         except Exception:
             logger.exception("发送[ETF]心跳失败")
 

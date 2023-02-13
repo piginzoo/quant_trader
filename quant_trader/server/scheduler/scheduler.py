@@ -4,13 +4,10 @@ import time
 
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 
+from quant_trader.server import broker
 from quant_trader.server.heartbeat.heartbeat_job import HeartbeatJob
 from quant_trader.utils import utils, CONF
-from quant_trader.server import broker
-from quant_trader.server.scheduler.position_sync_job import PositionSyncJob
-from quant_trader.server.scheduler.trade_job import TradeJob
 
 """
 为何扼要使用python的调度器，而不是用linux自带的contab呢？

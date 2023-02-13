@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import json
 import logging
 import os
 import time
@@ -404,10 +405,13 @@ class AStockPlotScheme(Tradimo):
         self.voldown = self.bardown
 
 
-def http_json_post(url, dict_msg):
+def http_json_post(url, dict_msg, files=None):
     logger.debug("向[%s]推送消息：%r", url, dict_msg)
     headers = {'Content-Type': 'application/json'}
-    response = requests.post(url, json=dict_msg, headers=headers)
+    if files:
+        response = requests.post(url, json=dict_msg, headers=headers)
+    else:
+        response = requests.post(url, json=dict_msg, headers=headers, files=files)
     logger.info('接口返回原始报文:%r', response.text if len(response.text) < 50 else response.text[:50] + "......")
     data = response.json()
     logger.info('接口返回Json报文:%r', data)
@@ -440,3 +444,17 @@ def is_trade_time():
     is_morning = time_0930 <= now <= time_1130
     is_afternoon = time_1300 <= now <= time_1500
     return is_morning or is_afternoon
+
+def serialize(obj,file_path):
+    # pickle是二进制的，不喜欢，改成json序列化了
+    # f = open(file_path, 'wb')
+    # pickle.dump(obj, f)
+    # f.close()
+    with open(file_path, "w") as f:
+        json.dump(obj, f, indent=2)
+
+def unserialize(file_path):
+    if not os.path.exists(file_path): return None
+    with open(file_path, 'r') as f:
+        obj = json.load(f)
+    return obj

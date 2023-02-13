@@ -46,14 +46,13 @@
             <label class="col-sm-2 control-label">选择券商:</label>
             <div class="col-sm-offset-2 col-sm-12">
                 <select class="custom-select" id="broker">
-                    <option value="mock" selected>同花顺模拟炒股</option>
-                    <option value="yinhe">银河证券</option>
+                    <option value="yinhe">国信iquant</option>
                 </select>
             </div>
         </div>
     </div>
     <div class="card">
-        <h2> 查看服务器 </h2>
+        <h2> 服务器 </h2>
         <ul class="list-group">
             <li class=" list-group-item alert-primary" role="alert" align="center">
                 <div class="alert alert-success" role="alert" id="lastime_box">
@@ -62,48 +61,17 @@
         <ul/>
     </div>
     <div class="card">
-        <h2> 查看数据库 </h2>
-        <ul class="list-group">
-            <li class=" list-group-item alert-primary" role="alert" align="center">
-                <a href="#" onclick="submit_it('position')"
-                   class="btn btn-block btn-big btn-primary vcenter">当前持仓</a>
-            </li>
-
-            <li class="list-group-item alert alert-primary" role="alert" align="center">
-                <a href="#" onclick="submit_it('task')"
-                   class="btn btn-block btn-big btn-primary vcenter">待交易任务</a>
-            </li>
-
-            <li class="list-group-item alert alert-primary" role="alert" align="center">
-                <a href="#" onclick="submit_it('log')"
-                   class="btn btn-block btn-big btn-primary vcenter">交易日志</a>
-            </li>
-
-            <ul/>
-    </div>
-    <div class="card">
-        <h2> 查看软件结果 </h2>
+        <h2> QMT服务 </h2>
         <ul class="list-group">
             <li class="list-group-item alert-primary" role="alert" align="center">
-                <a href="#" onclick="submit_it('true_position')"
-                   class="btn btn-block btn-big btn-primary vcenter">真实持仓</a>
+                <a href="#" onclick="submit_it('query_qmt')"
+                   class="btn btn-block btn-big btn-primary vcenter">软件信息</a>
             </li>
 
             <li class="list-group-item alert-primary" role="alert" align="center">
-                <a href="#" onclick="submit_it('today_entrusts')"
-                   class="btn btn-block btn-big btn-primary vcenter">当日委托</a>
+                <a href="#" onclick="submit_it('query_server')"
+                   class="btn btn-block btn-big btn-primary vcenter">服务信息</a>
             </li>
-
-
-            <li class="list-group-item alert-primary" role="alert" align="center">
-                <a href="#" onclick="submit_it('today_trades')"
-                   class="btn btn-block btn-big btn-primary vcenter">当日成交</a>
-            </li>
-
-            <li class="list-group-item alert-primary" role="alert" align="center">
-                <a href="#" onclick="submit_it('balance')" class="btn btn-block btn-big btn-primary vcenter">头寸情况</a>
-            </li>
-
         </ul>
     </div>
 </div>

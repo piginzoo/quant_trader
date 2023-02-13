@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 from quant_trader.utils import utils, conf
-from quant_trader.server.const import TRADE_STATUS_DONE, TRADE_BUY
+from quant_trader.server.const import TRADE_STATUS_DONE
 from quant_trader.server.db import trade_bo
 from quant_trader.server.db.trade_bo import TradeTask, TradeLog, TradePosition
 

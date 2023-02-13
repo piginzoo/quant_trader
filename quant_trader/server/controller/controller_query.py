@@ -23,9 +23,9 @@ def query():
     broker_name = request.args.get('broker', None)
 
     # 加一个安全限制
-    if token is None or token != CONF['broker_server']['token']:
-        logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
-        return "无效的访问", 400
+    # if token is None or token != CONF['broker_server']['token']:
+    #     logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
+    #     return "无效的访问", 400
 
     query_url = f"/api?action={action}&token={token}&broker={broker_name}"
 
