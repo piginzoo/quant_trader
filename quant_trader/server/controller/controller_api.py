@@ -3,6 +3,7 @@
 import datetime
 import json
 import logging
+import os.path
 from json import JSONDecodeError
 
 from flask import Blueprint, jsonify, request
@@ -98,6 +99,8 @@ def api():
                 """
                 for i in params['info']:
                     file_name = f"data/{i['name']}.json"
+                    if not os.path.exists("data"):
+                        os.mkdir("data")
                     utils.serialize(i['data'], file_name)
                     logger.debug("数据保存到：%s", file_name)
 
