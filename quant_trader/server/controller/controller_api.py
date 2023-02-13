@@ -89,7 +89,7 @@ def api():
             if params['name'] == 'heartbeat':
                 """
                 {'action': 'heartbeat',
-                 'name': 'hearbeat',
+                 'name': 'heartbeat',
                  'info': [
                      {'name':'accounts', 'data':get_accounts()},
                      {'name':'positions', 'data':get_positions()},
@@ -98,7 +98,7 @@ def api():
                 """
                 for i in params['info']:
                     file_name = f"data/{i['name']}.json"
-                    uitls.serialize(i['data'], file_name)
+                    utils.serialize(i['data'], file_name)
                     logger.debug("数据保存到：%s", file_name)
 
             return jsonify({'code': 0, 'msg': 'ok'}), 200
