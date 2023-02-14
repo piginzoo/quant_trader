@@ -1,5 +1,6 @@
 debug/
 conf/config.yml
+conf/config.product.yml
 .venv/
 data/
 .idea/

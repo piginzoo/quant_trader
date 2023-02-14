@@ -9,11 +9,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-trade_log = 'c:\\workspace\\iquant\\history\\transaction.csv'  # 交易记录
-#last_grid_position.json = 'c:\\workspace\\iquant\\history\\last_grid_position.json.json'  # 最后的日期
-last_grid_position = "./data/last_grid_position.json"
+conf = utils.load_config()
+
 # 所有的要发送的文件
-file_paths = [trade_log,last_grid_position]
+file_paths = conf['heartbeat']['files']
 
 def run():
     """
@@ -39,16 +38,18 @@ def run():
             }
             # 这里没用utils.http_post,单独写，必须这么写，用data发送，且，不能设置header，让自己去自动设
             response = requests.post(full_url, files=files, data=data)
+            logger.info("发送心跳包到=>%s，附带文件%d个",full_url,len(files))
             data = response.json()
             logger.info('接口返回Json报文:%r', data)
             return data
 
-        except Exception:
-            logger.exception("发送[ETF]心跳失败")
+        except Exception as e:
+            #logger.exception("发送[ETF]心跳失败")
+            logger.error("发送[ETF]心跳失败:"+str(e))
 
         # logger.info("发送[ETF]心跳完成：%s",datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d %H:%M:%S"))
-        time.sleep(60) # 写死了，懒得再写配置了
+        time.sleep(conf['heartbeat']['interval']) # 写死了，懒得再写配置了
 
 if __name__ == '__main__':
-    utils.init_logger()
+    utils.init_logger("logs/heartbeat.log")
     run()
