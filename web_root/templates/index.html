@@ -13,29 +13,42 @@
             window.location.href = href;
         }
 
-        $(document).ready(function(){
-             $.ajax({
-                url: '/api?action=heartbeat_query&name=etf&token={{token}}',
-                type: 'get',
-                success: function (json_data) {
-                    // console.log(json_data)
-                    $('#status').html(json_data['status'])
-                    $('#lastime').html(json_data['lastime'])
+        var heartbeats = ['qmt','server']
 
-                    if (json_data.status=='online'){
-                        $('#lastime_box').removeClass('alert-danger')
-                        $('#lastime_box').addClass('alert-success')
-                    }else{
-                        $('#lastime_box').removeClass('alert-success')
-                        $('#lastime_box').addClass('alert-danger')
+        $(document).ready(function(){
+
+             for (i in heartbeats){
+                 heartbeat_name = heartbeats[i]
+                 console.log("查询心跳："+heartbeat_name)
+                 $.ajax({
+                    url: '/api?action=heartbeat_query&name='+heartbeat_name+'&token={{token}}',
+                    type: 'get',
+                    success: function (json_data) {
+                        handle(json_data);
+                    },
+                    error: function (res) {
+                        console.log("错误发生：")
+                        console.log(res)
                     }
-                },
-                error: function (res) {
-                    console.log("错误发生：")
-                    console.log(res)
-                }
-             });
+                 });
+             }
         });
+
+        function handle(data){
+            /*
+            <div  role="alert" id="lastime_box">
+            */
+            var div = $("<div/>",{"class": "alert alert-success"})
+            div.html("名称："+data.name+"，状态："+data.status+"，最后更新时间："+data.lastime);
+            if (data.status=='online'){
+                div.removeClass('alert-danger')
+                div.addClass('alert-success')
+            }else{
+                div.removeClass('alert-success')
+                div.addClass('alert-danger')
+            }
+            $("#status").append(div);
+        }
     </script>
 </head>
 <body>
@@ -54,9 +67,7 @@
     <div class="card">
         <h2> 服务器 </h2>
         <ul class="list-group">
-            <li class=" list-group-item alert-primary" role="alert" align="center">
-                <div class="alert alert-success" role="alert" id="lastime_box">
-                    状态：<span id="status"></span>，最后时间：<span id="lastime"></span></div>
+            <li class=" list-group-item alert-primary" role="alert" align="center" id="status">
             </li>
             <li class="list-group-item alert-primary" role="alert" align="center">
                 <a href="#" onclick="submit_it('query_server')"

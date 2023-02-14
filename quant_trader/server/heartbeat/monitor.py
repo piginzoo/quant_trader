@@ -54,7 +54,22 @@ def handle(broker):
 
     # 现在的时间
     now = beijing_time()
-    heartbeats = utils.CONF['heartbeat']
+    heartbeats = utils.CONF['scheduler']['heartbeat']['services']
+    """
+    scheduler:
+            heartbeat: # 客户端配置
+                interval: 30 # 多久检查一次，1分钟
+                services:
+                  -
+                    name: 'server' # 服务器的心跳
+                    timeout: 30 # 30分钟过期
+                    check_time: 9:30~15:00 # 检测时间
+                  -
+                    name: 'qmt' # qmt软件的心跳
+                    timeout: 30 # 30分钟过期
+                    check_time: 9:30~15:00 # 检测时间    
+    """
+
     for heartbeat in heartbeats:
         name = heartbeat['name']
         # 看看缓存的上次更新时间

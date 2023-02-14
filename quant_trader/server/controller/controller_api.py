@@ -82,7 +82,7 @@ def api():
             把服务器上的信息返回给刻度爱你
             """
             data = []
-            logger.info("处理请求[%s]",action)
+            logger.info("处理请求[%s]", action)
             if os.path.exists("data/last_grid_position.json"):
                 data.append({
                     'title': 'ETF定投网格位置',
@@ -161,7 +161,7 @@ def api():
                 return jsonify({'code': 0, 'msg': 'ok'}), 200
 
         """
-        查询用，用于返回给网页上信息
+        查询用，用于返回给index.hml网页上信息信息
         """
         if action == HEARTBEAT_QUERY:
             name = request.args.get('name')
@@ -172,7 +172,7 @@ def api():
             s_status = 'N/A'
             if lastime: s_lastime = datetime.datetime.strftime(lastime, "%Y-%m-%d %H:%M:%S")
             if status: s_status = status
-            return jsonify({'code': 0, 'lastime': s_lastime, 'status': s_status}), 200
+            return jsonify({'code': 0, 'name': name, 'lastime': s_lastime, 'status': s_status}), 200
 
         logger.error("无效的访问参数：%r", request.args.get)
         return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200
