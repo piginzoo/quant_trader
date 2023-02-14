@@ -6,6 +6,7 @@ import logging
 import os.path
 from json import JSONDecodeError
 
+import pandas as pd
 from flask import Blueprint, jsonify, request
 
 from quant_trader.server import broker
@@ -19,14 +20,20 @@ qmt_broker = broker.get("qmt")
 
 
 def request2json(request):
-    logger.debug("Got json data:%d bytes", len(request))
     try:
-        data = request.decode('utf-8')
-        data = data.replace('\r\n', '')
-        data = data.replace('\n', '')
-        if data.strip() == "": return {}
-        data = json.loads(data)
-        return data
+        json_data = request.get_data()
+        if len(json_data) > 0:
+            logger.debug("接收到Json数据，长度：%d", len(json_data))
+            data = request.decode('utf-8')
+            data = data.replace('\r\n', '')
+            data = data.replace('\n', '')
+            if data.strip() == "": return {}
+            data = json.loads(data)
+            return data
+        if len(request.form) > 0:
+            logger.debug("接收到表单Form数据，长度：%d", len(request.form))
+            return request.form
+        return None
     except JSONDecodeError as e:
         logger.exception("JSon数据格式错误")
         raise Exception("JSon数据格式错误:" + str(e))
@@ -41,13 +48,12 @@ def api():
         #     logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
         #     return "无效的访问1", 400
 
-        params = request2json(request.get_data())
+        params = request2json(request)
 
         # 取得action
         action = request.args.get('action', None)
         if action is None:
             action = params.get('action', None)  # 如果get里面没有，去post的json的'action'中获得
-
         if action is None:
             logger.warning("请求不合法:未包含action，不知道你要干啥？")
             return jsonify({'code': -1, 'msg': f'action is not set, invalid call'}), 200
@@ -64,16 +70,40 @@ def api():
                  'msg': 'ok',
                  'title': 'QMT信息',
                  'data': [
-                     {'title': 'accounts', 'table':  accounts if accounts else []},
-                     {'tile': 'positions', 'table':  positions if positions else []},
-                     {'title': 'deals', 'table': deals if deals else []}
+                     {'title': 'accounts', 'type': 'table', 'data': accounts if accounts else []},
+                     {'tile': 'positions', 'type': 'table', 'data': positions if positions else []},
+                     {'title': 'deals', 'type': 'table', 'data': deals if deals else []}
                  ]
                  }), 200
             # [{'测试1':11,'测试2':12},{'测试1':21,'测试2':22}]}]
 
         if action == QERUY_SERVER:
+            """
+            把服务器上的信息返回给刻度爱你
+            """
+            data = []
+            logger.info("处理请求[%s]",action)
+            if os.path.exists("data/last_grid_position.json"):
+                data.append({
+                    'title': 'ETF定投网格位置',
+                    'type': 'dict',
+                    'data': utils.unserialize("data/last_grid_position.json")}
+                )
+                logger.debug("返回data/last_grid_position.json")
+            if os.path.exists("data/transaction.csv"):
+                data.append({
+                    'title': '交易记录',
+                    'type': 'table',
+                    'data': utils.dataframe_to_dict_list(pd.read_csv("data/transaction.csv"))}
+                )
+                logger.debug("返回data/transaction.csv")
             return jsonify(
-                {'code': 0, 'msg': 'ok'}), 200
+                {'code': 0,
+                 'msg': 'ok',
+                 'title': 'QMT信息',
+                 'data': data
+                 }), 200
+            # [{'测试1':11,'测试2':12},{'测试1':21,'测试2':22}]}]
 
         # heartbeat ，2023.2.8
         """
@@ -83,14 +113,16 @@ def api():
         但是，不是所有的都会检测，所以需要一个配置表
         """
         if action == HEARTBEAT:
+            # 先更新一下心跳
             qmt_broker.heartbeat(params['name'])
             qmt_broker.set_status(params['name'], 'online')
             logger.debug("接收到心跳包：%s", params['name'])
 
-            if params['name'] == 'heartbeat':
+            # 这个是接受来自qmt的心跳数据
+            if params['name'] == 'qmt':
                 """
                 {'action': 'heartbeat',
-                 'name': 'heartbeat',
+                 'name': 'qmt',
                  'info': [
                      {'name':'accounts', 'data':get_accounts()},
                      {'name':'positions', 'data':get_positions()},
@@ -104,29 +136,34 @@ def api():
                     utils.serialize(i['data'], file_name)
                     logger.debug("数据保存到：%s", file_name)
 
-            return jsonify({'code': 0, 'msg': 'ok'}), 200
+                return jsonify({'code': 0, 'msg': 'ok'}), 200
+
+            # 这个是接受来server的心跳数据
+            if params['name'] == 'server':
+                """
+                {'action': 'heartbeat',
+                 'name': 'server',
+                 'info': [
+                     {'name':'accounts', 'data':get_accounts()},
+                     {'name':'positions', 'data':get_positions()},
+                     {'name':'deals', 'data':get_deals()}
+                ]}                
+                """
+                files = request.files
+                logger.debug("接受服务器的心跳包，包含%d个文件附件", len(files))
+                for name, file in files.items():
+                    file_name = f"data/{name}"
+                    if not os.path.exists("data"):
+                        os.mkdir("data")
+                    file.save(file_name)
+                    logger.debug("数据保存到：%s", file_name)
+
+                return jsonify({'code': 0, 'msg': 'ok'}), 200
 
         """
         查询用，用于返回给网页上信息
         """
         if action == HEARTBEAT_QUERY:
-            name = request.args.get('name')
-            lastime = qmt_broker.last_active_datetime.get(name, None)
-            status = qmt_broker.server_status.get(name, None)
-            logger.debug("查询[%s]心跳结果：最后更新时间：%r，状态：%r", name, lastime, status)
-            s_lastime = 'N/A'
-            s_status = 'N/A'
-            if lastime: s_lastime = datetime.datetime.strftime(lastime, "%Y-%m-%d %H:%M:%S")
-            if status: s_status = status
-            return jsonify({'code': 0, 'lastime': s_lastime, 'status': s_status}), 200
-
-        logger.error("无效的访问参数：%r", request.args.get)
-        return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200
-
-        """
-        查询用，用于返回给网页上信息
-        """
-        if action == TRADE_DETAIL:
             name = request.args.get('name')
             lastime = qmt_broker.last_active_datetime.get(name, None)
             status = qmt_broker.server_status.get(name, None)

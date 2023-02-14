@@ -46,7 +46,7 @@
             <label class="col-sm-2 control-label">选择券商:</label>
             <div class="col-sm-offset-2 col-sm-12">
                 <select class="custom-select" id="broker">
-                    <option value="yinhe">国信iquant</option>
+                    <option value="guoxin">国信iquant</option>
                 </select>
             </div>
         </div>
@@ -58,20 +58,20 @@
                 <div class="alert alert-success" role="alert" id="lastime_box">
                     状态：<span id="status"></span>，最后时间：<span id="lastime"></span></div>
             </li>
+            <li class="list-group-item alert-primary" role="alert" align="center">
+                <a href="#" onclick="submit_it('query_server')"
+                   class="btn btn-block btn-big btn-primary vcenter">服务器信息</a>
+            </li>
         <ul/>
     </div>
     <div class="card">
-        <h2> QMT服务 </h2>
+        <h2> QMT软件 </h2>
         <ul class="list-group">
             <li class="list-group-item alert-primary" role="alert" align="center">
                 <a href="#" onclick="submit_it('query_qmt')"
-                   class="btn btn-block btn-big btn-primary vcenter">软件信息</a>
+                   class="btn btn-block btn-big btn-primary vcenter">QMT/iQuant信息</a>
             </li>
 
-            <li class="list-group-item alert-primary" role="alert" align="center">
-                <a href="#" onclick="submit_it('query_server')"
-                   class="btn btn-block btn-big btn-primary vcenter">服务信息</a>
-            </li>
         </ul>
     </div>
 </div>

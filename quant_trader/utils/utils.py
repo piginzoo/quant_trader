@@ -405,13 +405,10 @@ class AStockPlotScheme(Tradimo):
         self.voldown = self.bardown
 
 
-def http_json_post(url, dict_msg, files=None):
+def http_json_post(url, dict_msg):
     logger.debug("向[%s]推送消息：%r", url, dict_msg)
     headers = {'Content-Type': 'application/json'}
-    if files:
-        response = requests.post(url, json=dict_msg, headers=headers)
-    else:
-        response = requests.post(url, json=dict_msg, headers=headers, files=files)
+    response = requests.post(url, json=dict_msg)
     logger.info('接口返回原始报文:%r', response.text if len(response.text) < 50 else response.text[:50] + "......")
     data = response.json()
     logger.info('接口返回Json报文:%r', data)
@@ -458,3 +455,12 @@ def unserialize(file_path):
     with open(file_path, 'r') as f:
         obj = json.load(f)
     return obj
+
+
+def dataframe_to_dict_list(df):
+    data = df.values.tolist()
+    columns = df.columns.tolist()
+    return [
+        dict(zip(columns, datum))
+        for datum in data
+    ]

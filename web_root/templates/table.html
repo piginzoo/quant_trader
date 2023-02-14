@@ -10,33 +10,33 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js">
     </script>
     <script type="text/javascript">
+        /* 接收到的数据格式如下：
+        var test_data =
+        {
+            'code': 0,
+             'msg': 'ok',
+             'title': 'QMT信息',
+             'data': [
+                 {'title': '交易信息', 'type': 'table', 'data': [{'交易1':11,'交易2':12},{'交易1':21,'交易2':22}]},
+                 {'title': '仓位信息', 'type': 'table', 'data': [{'仓位1':11,'仓位2':12},{'仓位1':21,'仓位2':22}]},
+                 {'title': '头寸情况', 'type': 'dict', 'data': {'总资金':1234,'总市值':5678}}
+             ]
+        }
+        其中，type标识是table还是dict，分别显示不同的形式
+        */
+
+        // HTML文本生成用的div的css selector
+        var content_selector = '#content'
+
         $(document).ready(function(){
+             //测试用
+             //handle(test_data);
+
              $.ajax({
                 url: '{{ query_url | safe }}',
                 type: 'get',
                 success: function (data) {
-                    if (data.code!=0){
-                        $('#title').html("错误发生："+data.msg);
-                        return;
-                    }
-                    // 插入标题
-                    if ('title' in data){
-                        $('#content').append($('<h2/>').html(data.title))
-                    }
-
-                    if ('data' in data){
-                        if (Array.isArray(data.data)){
-                            for (var i = 0; i <data.data.length ; i++) {
-                                _data = data.data[i]
-                                if ('title' in _data){
-                                    $('#content').append($('<h4/>').html(data.title))
-                                }
-                                if ('table' in _data){
-                                    $('#content').append(create_table(_data.table,'#content'));
-                                }
-                            }
-                        }
-                    }
+                    handle(data);
                 },
                 error: function (res) {
                     console.log("错误发生：")
@@ -45,10 +45,96 @@
             });
         });
 
+        function handle(data){
+            if (data.code!=0){
+                $(content_selector).html("错误发生，原始返回消息为："+data);
+                return;
+            }
+            // 大标题，用H2
+            if ('title' in data){
+                console.log('大标题：'+data.title);
+                $(content_selector).append($('<h2/>').html(data.title))
+            }
 
-         function create_table(list, selector) {
-             var table = $('<table/>');
-             var cols = get_header(list, selector);
+            // 看是否有data项，再root级别，存放所有的数据
+            if (!'data' in data){
+                console.log('错误！数据中不包含data属性');
+                return;
+            }
+
+            // data必须是数组
+            if (!Array.isArray(data.data)){
+                console.log('错误！数据中的data项，类型必须为数组');
+                return;
+            }
+
+            //遍历数据
+            for (var i = 0; i <data.data.length ; i++) {
+                _data = data.data[i]
+
+                // 如果有title属性，插入到html中，用H4
+                if ('title' in _data){
+                    console.log('小标题：',+ _data.title)
+                    $(content_selector).append($('<h4/>',{'style':'text-align:left'}).html(_data.title))
+                }
+
+                if (! 'type' in _data){
+                   console.log('错误！此行数据中无type属性，无法判断数据类型');
+                   continue;
+                }
+
+                if (! 'data' in _data){
+                   console.log('错误！此行数据中无data属性，无法处理数据');
+                   continue;
+                }
+
+                //如果是表格类型，插入表格
+                if (_data.type == 'table'){
+                    create_table(_data.data,content_selector);
+                    continue;
+                }
+
+                //如果是dict字典类型，插入key value表格
+                if (_data.type == 'dict'){
+                    create_dict(_data.data,content_selector);
+                    continue;
+                }
+
+                console.log('错误！此行数据中type属性为['+_data_type+']，无法判断数据类型，允许的类型为：table,dict');
+            }
+        }
+
+        //动态创建字典类型数据展示
+        /*
+        <div class="list-group">
+            <div class="list-group-item">
+                <div class="col-md-4 ">{{key}}</div>
+                <div class="col-md-4"> {{value}}</div>
+            </div>
+        </div>
+        */
+        function create_dict(data,selector){
+            console.log('显示dict数据：'+data);
+            var root = $('<div/>')
+            root.css("class","list-group");
+            for (var k in data) {
+                v = data[k]
+
+                var item = $('<div/>',{"class":"list-group-item"})
+                var key = $('<div/>',{"class":"col-md-4"}).html(k);
+                var value = $('<div/>',{"class":"col-md-4"}).html(v);
+                item.append(key);
+                item.append(value);
+                root.append(item);
+            }
+            $(selector).append(root);
+        }
+
+        //动态创建表格
+        function create_table(list, selector) {
+
+             var table = $('<table/>',{'class':'table table-hover table-bordered table-striped'});
+             var cols = get_header(list, table);
              for (var i = 0; i <list.length ; i++) {
                  var row = $('<tr/>');
                  for (var colIndex = 0; colIndex <cols.length ; colIndex++)
@@ -59,31 +145,32 @@
                  }
                  table.append(row);
              }
-             $(selector).append(table);
-         }
 
-         function get_header(list, selector) {
-             var columns = [];
-             var header = $('<tr />');
-             header.append($('<th/>').html(''));
-             for (var i = 0; i <list.length ; i++) {
-                 var row = list [i];
-                 for (var k in row) {
-                     if ($.inArray(k, columns) == -1) {
-                         columns.push(k);
-                         header.append($('<th/>').html(k));
-                     }
+             $(selector).append(table);
+        }
+
+        //动态创建表格头
+        function get_header(list, table) {
+         var columns = [];
+         var header = $('<tr />');
+         for (var i = 0; i <list.length ; i++) {
+             var row = list [i];
+             for (var k in row) {
+                 if ($.inArray(k, columns) == -1) {
+                     columns.push(k);
+                     header.append($('<th/>').html(k));
                  }
              }
-             $(selector).append(header);
-             return columns;
          }
+         table.append(header);
+         return columns;
+        }
     </script>
 </head>
 
 <body style="text-align:center;" id="body">
     <div class="container-fluid container-panel">
-        <div id="content" align="center"  class="table table-striped"></div>
+        <div id="content" class="table table-striped"></div>
         <div>
             <a class="btn btn-block btn-primary" href="/query?token={{token}}" role="button">返回</a>
         </div>
