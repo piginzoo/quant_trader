@@ -43,11 +43,11 @@ def request2json(request):
 @app.route('api', methods=["GET", "POST"])
 def api():
     try:
-        # token = request.args.get('token', None)
-        # # 加一个安全限制
-        # if token is None or token != CONF['broker_server']['token']:
-        #     logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
-        #     return "无效的访问1", 400
+        token = request.args.get('token', None)
+        # 加一个安全限制
+        if token is None or token != CONF['broker_server']['token']:
+            logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
+            return "无效的访问1", 400
 
         params = request2json(request)
 
