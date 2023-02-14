@@ -22,7 +22,8 @@ qmt_broker = broker.get("qmt")
 def request2json(request):
     try:
         json_data = request.get_data()
-        if len(json_data) > 0:
+
+        if request.headers.get('content-type') == 'application/json' and len(json_data) > 0:
             logger.debug("接收到Json数据，长度：%d", len(json_data))
             data = json_data.decode('utf-8')
             data = data.replace('\r\n', '')
