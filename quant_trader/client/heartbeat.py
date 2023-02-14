@@ -40,9 +40,11 @@ def run():
             response = requests.post(full_url, files=files, data=data)
             logger.info("发送心跳包到=>%s，附带文件%d个",full_url,len(files))
             data = response.json()
-            logger.info('接口返回Json报文:%r', data)
-            return data
 
+            if data and data.get('code',None) is not None:
+                logger.debug("接口返回正常，code=%s，msg=%s",data['code'],data['msg'])
+            else:
+                logger.warning('接口异常，返回的报文:%r', data)
         except Exception as e:
             #logger.exception("发送[ETF]心跳失败")
             logger.error("发送[ETF]心跳失败:"+str(e))

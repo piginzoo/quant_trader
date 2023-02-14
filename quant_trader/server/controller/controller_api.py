@@ -24,7 +24,7 @@ def request2json(request):
         json_data = request.get_data()
         if len(json_data) > 0:
             logger.debug("接收到Json数据，长度：%d", len(json_data))
-            data = request.decode('utf-8')
+            data = json_data.decode('utf-8')
             data = data.replace('\r\n', '')
             data = data.replace('\n', '')
             if data.strip() == "": return {}
