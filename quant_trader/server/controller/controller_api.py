@@ -71,9 +71,9 @@ def api():
                  'msg': 'ok',
                  'title': 'QMT信息',
                  'data': [
-                     {'title': 'accounts', 'type': 'table', 'data': accounts if accounts else []},
-                     {'tile': 'positions', 'type': 'table', 'data': positions if positions else []},
-                     {'title': 'deals', 'type': 'table', 'data': deals if deals else []}
+                     {'title': '账户信息', 'type': 'table', 'data': accounts if accounts else {}},
+                     {'title': '持仓信息', 'type': 'table', 'data': positions if positions else []},
+                     {'title': '今日成交', 'type': 'table', 'data': deals if deals else []}
                  ]
                  }), 200
             # [{'测试1':11,'测试2':12},{'测试1':21,'测试2':22}]}]
