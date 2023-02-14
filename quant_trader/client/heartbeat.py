@@ -41,8 +41,8 @@ def run():
             logger.info("发送心跳包到=>%s，附带文件%d个",full_url,len(files))
             data = response.json()
 
-            if data and data.get('code',None) is not None:
-                logger.debug("接口返回正常，code=%s，msg=%s",data['code'],data['msg'])
+            if data and data.get('code',None) is not None and data['code']==0:
+                logger.debug("接口返回正常")
             else:
                 logger.warning('接口异常，返回的报文:%r', data)
         except Exception as e:
