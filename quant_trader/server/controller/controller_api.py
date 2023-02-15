@@ -131,9 +131,17 @@ def api():
                 ]}                
                 """
                 for i in params['info']:
-                    file_name = f"data/{i['name']}.json"
+
                     if not os.path.exists("data"):
                         os.mkdir("data")
+
+                    # 这个是为了查询当日的
+                    file_name = f"data/{i['name']}.json"
+                    utils.serialize(i['data'], file_name)
+
+                    # 这个是为了保存历史用的
+                    today = datetime.datetime.strftime(datetime.datetime.now(),"%Y%m%d")
+                    file_name = f"data/{i['name']}.{today}.json"
                     utils.serialize(i['data'], file_name)
                     logger.debug("数据保存到：%s", file_name)
 
