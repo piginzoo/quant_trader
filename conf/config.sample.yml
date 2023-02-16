@@ -1,84 +1,68 @@
 dateformat: '%Y%m%d'
-datasource: 'database' # tushare,database,akshare
-datasources:
-        tushare:
-                token: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' # 你的tushare token，需要单独购买
-        mysql:
-                uid: 'root'
-                pwd: '123456'
-                db:  'tushare'
-                host: '127.0.0.1'
-                port: 3306
-
 
 # 下单服务器端的对应的客户端配置
 broker_client:
-        host: '<your IP>'
+        host: '127.0.0.1'
         url: '/api'
-        port: 8888
-        token: 'your_token' # 这个和下面的下单服务器的token一致就好，自己随意定义
-
-strategy:
-        position: 10 # 最多持有5只股票，这个用于计算每只股票的份数
-        max_value: 20000 # 最大投入资金，这个是为了安全，不会买入太多，未来可以逐步放开
-        max_drawdown: 0.1 # 最大回撤容忍度
+        port: 8080
+        token: 'xxxxxxxxxxxxxxxxxx' # 这个和下面的下单服务器的token一致就好，自己随意定义
 
 notification: # level: ERROR,INFO是分开的，而不是传统意义上包含的关系，这样做是为了方便分开通知和报警
         - weixin:
            -
-             name: '通知群' # 企业微信的访问链接，需要在企业微信的群机器人的配置中获得
-             url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxx-xxxxx-xxxx-xxxx-xxxxxxxxx'
+             name: '通知群'
+             url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxxxxxxxxxxxxxxxxxx'
              level: 'INFO'
            -
              name: '警告群'
-             url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxx-xxxxx-xxxx-xxxx-xxxxxxxxx'
+             url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxxxxxxxxxxxxxxxxxx'
              level: 'ERROR,WARN'
            -
              name: '信号群'
-             url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxx-xxxxx-xxxx-xxxx-xxxxxxxxx'
+             url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxxxxxxxxxxxxxxxxxx'
              level: 'SIGNAL'
         - email:
            -
              name: '我的邮箱'
-             url: 'xxxxxx@qq.com'
+             url: 'xxxxxxxxx@qq.com'
              level: 'INFO,ERROR,WARN'
 
 email:
     name: '我的qq邮箱'
     host: 'smtp.qq.com'
-    uid: 'xxxxx@qq.com'
-    pwd: 'yyyyyyyyyy' # 如果是QQ邮箱，需要在qq邮箱上配置访问token
+    uid: 'xxxxxxxxx@qq.com'
+    pwd: 'xxxxxxxxxxxx'
 
 # -------- 以下为服务器配置，懒得分开了，放一起吧 ---------
 
 # 下单服务器的配置
 broker_server:
-        token: 'your_token' # 防止恶意访问的token设置
-        port: 8888
+        token: 'xxxxxxxxxxxxxxxxxx'
+        port: 8080
 
-# 下单服务器支持的券商信息
-brokers:
-        yinhe: # 银河证券
-                uid: 'xxxxxxx'
-                pwd: 'yyyyyyy'
-                client_type: 'ths5.19'
-                exe_path: 'c:\software\ths\xiadan.exe'
-        mock: # 同花顺模拟炒股
-                uid: 'xxxxxxx'
-                pwd: 'yyyyyyy'
-                client_type: 'universal_client'
-                exe_path: 'c:\software\ths.mock\xiadan.exe'
 # 当前使用的券商
 broker:
-        name: 'mock'
+        name: 'qmt'
         buy_limit: 0.05 # 超过5%的涨幅就不买了
         sell_limit: 0.05# 超过5%的跌幅就不卖了
 
 scheduler:
-        trade: # 买卖调度器
-            interval: 10 # 调度相隔时间（单位：分钟）
-            buy_retry: 5 # 买重试的次数，超过这个次数，买单就取消了
-            sell_retry_once: 5 # 卖的时候，要反复尝试卖，这个是一次调度的时候尝试的次数（和买的有区别的）
+        heartbeat: # 客户端配置
+            interval: 3 # 多久检查一次，1分钟
+            services:
+              -
+                name: 'server' # 服务器的心跳
+                timeout: 3 # 30分钟过期
+                check_time: 9:30~15:00 # 检测时间
+              -
+                name: 'qmt' # qmt软件的心跳
+                timeout: 3 # 30分钟过期
+                check_time: 9:30~15:00 # 检测时间
 
-        position_sync:
-            cron: '0 23 * * *' # 每天23点
+heartbeat:
+        interval: 3 # 发送心跳的间隔
+        dir: # 发送心跳的文件夹
+          - 'data/etf'
+etf:
+    dir: 'data'
+    svg_path: 'data/etf.svg'
