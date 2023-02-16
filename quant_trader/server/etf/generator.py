@@ -77,3 +77,9 @@ def generate_svg(dfs, svg_path):
                     arrowprops=dict(facecolor='black', shrink=0.05))
     fig.tight_layout()
     fig.savefig(svg_path, format='svg', dpi=30)
+
+    # 2023.2.16,bugfix for 内存泄露 https://stackoverflow.com/questions/7101404/how-can-i-release-memory-after-creating-matplotlib-figures
+    fig.clf()
+    plt.close()
+    del dfs
+
