@@ -149,15 +149,6 @@ def api():
 
             # 这个是接受来server的心跳数据
             if params['name'] == 'server':
-                """
-                {'action': 'heartbeat',
-                 'name': 'server',
-                 'info': [
-                     {'name':'accounts', 'data':get_accounts()},
-                     {'name':'positions', 'data':get_positions()},
-                     {'name':'deals', 'data':get_deals()}
-                ]}                
-                """
                 files = request.files
                 logger.debug("接受服务器的心跳包，包含%d个文件附件", len(files))
                 for name, file in files.items():

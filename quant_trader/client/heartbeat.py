@@ -1,19 +1,17 @@
-import datetime
-import json
-import os.path
+import logging
+import os
 import time
+
 import requests
 
 from quant_trader.utils import utils
-import logging
 
 logger = logging.getLogger(__name__)
 
 conf = utils.load_config()
 
 # 所有的要发送的文件
-file_paths = conf['heartbeat']['files']
-
+DIRS = conf['heartbeat']['dir']
 def run():
     """
     将买、卖信号推送到服务器,间隔是60s，写死的，没必要灵活配置
@@ -24,13 +22,16 @@ def run():
             full_url = utils.get_url()
 
             files = {}
-            for file_path in file_paths:
-                if not os.path.exists(file_path):
-                    logger.warning("文件不存在：%s",file_path)
-                    continue
-                file_name = os.path.split(file_path)[-1]
-                files[file_name] = open(file_path, "rb")
-                logger.debug("加载文件：%s",file_path)
+
+            for dir in DIRS:
+                for file_name in os.listdir(dir):
+                    file_path = os.path.join(dir,file_name)
+                    if not os.path.exists(file_path):
+                        logger.warning("文件不存在：%s",file_path)
+                        continue
+                    file_name = os.path.split(file_path)[-1]
+                    files[file_name] = open(file_path, "rb")
+                    logger.debug("加载文件：%s",file_path)
 
             data = {
                     "action": "heartbeat",
@@ -46,11 +47,10 @@ def run():
             else:
                 logger.warning('接口异常，返回的报文:%r', data)
         except Exception as e:
-            #logger.exception("发送[ETF]心跳失败")
             logger.error("发送[ETF]心跳失败:"+str(e))
 
         # logger.info("发送[ETF]心跳完成：%s",datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d %H:%M:%S"))
-        time.sleep(conf['heartbeat']['interval']) # 写死了，懒得再写配置了
+        time.sleep(conf['heartbeat']['interval'])
 
 if __name__ == '__main__':
     utils.init_logger("logs/heartbeat.log")
