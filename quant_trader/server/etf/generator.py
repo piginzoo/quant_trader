@@ -110,8 +110,8 @@ def generate_jpg(dfs, jpg_path):
         label = \
 f"""日期:{last_date}
 收盘:{df.iloc[-1].close}
-850均值:{round(df.iloc[-1].ma,2)}
-距离均值:{round(df.iloc[-1].diff_percent_close2ma * 100, 2)}%"""
+850均值:{round(df.iloc[-1].ma,4)}
+距离均值:{round(df.iloc[-1].diff_percent_close2ma * 100, 4)}%"""
         ax.annotate(label,
                     color='r',
                     xy=(x, y),
