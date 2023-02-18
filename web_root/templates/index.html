@@ -9,10 +9,11 @@
     <script>
         function submit_it(action){
             var broker = document.getElementById("broker").value;
-            if action=='etf':
+            if (action=='etf'){
                 href="/query?action="+action;
-            else:
+            }else{
                 href="/query?action="+action+"&broker="+broker+"&token={{token}}";
+            }
             window.location.href = href;
         }
 
