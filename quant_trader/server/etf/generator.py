@@ -104,7 +104,7 @@ def generate_jpg(dfs, jpg_path):
         positive = df.iloc[-1].p
         negative = df.iloc[-1].n
         ax.text(df.iloc[0].date, df.close.max(), '正收益80%分位数：{:.2f}%'.format(positive * 100))
-        ax.text(df.iloc[0].date, df.close.max() - 0.2, '负收益20%分位数：{:.2f}%'.format(negative * 100), color='r')
+        ax.text(df.iloc[0].date, df.close.max() - 0.2, '负收益40%分位数：{:.2f}%'.format(negative * 100), color='r')
         last_date = datetime.strftime(x,"%Y-%m-%d")
         print(last_date)
         label = f"{last_date}  {round(df.iloc[-1].diff_percent_close2ma * 100, 2)}%"
