@@ -2,13 +2,13 @@ dateformat: '%Y%m%d'
 
 # 下单服务器端的对应的客户端配置
 broker_client:
-        host: '127.0.0.1'
+        host: 'xxxxxx' # 远端服务器的IP或者域名
         url: '/api'
         port: 8080
         token: 'xxxxxxxxxxxxxxxxxx' # 这个和下面的下单服务器的token一致就好，自己随意定义
 
 notification: # level: ERROR,INFO是分开的，而不是传统意义上包含的关系，这样做是为了方便分开通知和报警
-        - weixin:
+        - weixin: # 企业微信
            -
              name: '通知群'
              url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxxxxxxxxxxxxxxxxxx'
@@ -21,7 +21,7 @@ notification: # level: ERROR,INFO是分开的，而不是传统意义上包含�
              name: '信号群'
              url: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxxxxxxxxxxxxxxxxxx'
              level: 'SIGNAL'
-        - email:
+        - email: # 邮件
            -
              name: '我的邮箱'
              url: 'xxxxxxxxx@qq.com'
@@ -48,21 +48,22 @@ broker:
 
 scheduler:
         heartbeat: # 客户端配置
-            interval: 3 # 多久检查一次，1分钟
+            interval: 30 # 多久检查一次，单位是分钟
             services:
               -
                 name: 'server' # 服务器的心跳
-                timeout: 3 # 30分钟过期
+                timeout: 30 # 30分钟过期，单位是分钟
                 check_time: 9:30~15:00 # 检测时间
               -
                 name: 'qmt' # qmt软件的心跳
-                timeout: 3 # 30分钟过期
+                timeout: 30 # 30分钟过期，单位是分钟
                 check_time: 9:30~15:00 # 检测时间
 
 heartbeat:
-        interval: 3 # 发送心跳的间隔
+        interval: 300 # 发送心跳的间隔，单位是秒
         dir: # 发送心跳的文件夹
           - 'data/etf'
 etf:
     dir: 'data'
     svg_path: 'data/etf.svg'
+    jpg_path: '/static/img/etf.jpg'
