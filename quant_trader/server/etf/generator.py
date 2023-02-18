@@ -1,18 +1,36 @@
 import os
+import time
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 import logging
+import gc
 
 logger = logging.getLogger(__name__)
 matplotlib.use('agg')
 
 
 def generate(conf):
+    """
+    本来生成svg，太大,1.2m，导致我的api1-tokyo服务器总是导致内存溢出，
+    所以改成了生成jpg文件，也不推送图片/svg内容回去了，
+    而是改成推生成推片的服务器url，这样最节省资源。
+    :param conf:
+    :return:
+    """
+
     # 加载各个etf,存放目录里面还有别的文件，所以要过滤下
     # 为何不单独放一个目录，是因为就不通用了，那个目录里放着所有需要upload服务器的文件
     etf_dir = conf['etf']['dir']
-    svg_path = conf['etf']['svg_path']
+    jpg_url = conf["etf"]["jpg_path"]
+    jpg_fullpath = f'web_root{jpg_url}'
+
+    if not is_need_regenerate(jpg_fullpath):
+        today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
+        logger.debug("今日[%s]图片已经生成，直接返回：%s", today_date, jpg_fullpath)
+        return jpg_url
+
     dfs = []
     # 510330.SH.csv
     for f in os.listdir(etf_dir):
@@ -26,9 +44,24 @@ def generate(conf):
         df = calc(df)
         logger.debug("计算了[%s]数据:%s", code, file_path)
         dfs.append(df)
-    generate_svg(dfs, svg_path)
-    logger.debug("生成了SVG图")
-    return svg_path
+    generate_jpg(dfs, jpg_fullpath)
+    logger.debug("生成了JPG图:%s", jpg_fullpath)
+    return jpg_url
+
+
+def is_need_regenerate(full_path):
+    """
+    为了防止内存溢出，每天只生成1次，
+    :param full_path:
+    :return:
+    """
+    if not os.path.exists(full_path):
+        return False
+    stat = os.stat(full_path)
+    file_date = time.strftime('%Y%m%d', time.localtime(stat.st_ctime))
+    today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
+    logger.debug("文件%s vs 今日%s",file_date,today_date)
+    return not file_date == today_date
 
 
 def load(file_path):
@@ -53,10 +86,10 @@ def calc(df):
     return df
 
 
-def generate_svg(dfs, svg_path):
-    fig = plt.figure(figsize=(20, 10 * len(dfs)))
+def generate_jpg(dfs, jpg_path):
+    fig = plt.figure(figsize=(20, 5 * len(dfs)))
     for i, df in enumerate(dfs):
-        ax = fig.add_subplot(len(dfs), 1, i + 1)
+        ax = fig.add_subplot(len(dfs), 1, i + 1)  # , rasterized=True) # rasterized 栅格化，把svg矢量变图片
         ax.set_title(df.iloc[0].code)
         ax.plot(df.date, df.close)
         ax.plot(df.date, df.ma, color='#6495ED', linestyle='--', linewidth=1)
@@ -64,7 +97,7 @@ def generate_svg(dfs, svg_path):
         ax.set_ylabel('etf基金价格')
 
         x = df.iloc[-1].date
-        y = df.iloc[-1].close
+        y = df.iloc[-1].close + 0.1
         x_text = df.iloc[-100].date
         y_text = df.iloc[-1].close + 0.2
         positive = df.iloc[-1].p
@@ -72,14 +105,17 @@ def generate_svg(dfs, svg_path):
         ax.text(df.iloc[0].date, df.close.max(), '正收益80%分位数：{:.2f}%'.format(positive * 100))
         ax.text(df.iloc[0].date, df.close.max() - 0.2, '负收益20%分位数：{:.2f}%'.format(negative * 100), color='r')
         label = str(round(df.iloc[-1].diff_percent_close2ma * 100, 2)) + "%"
-        ax.annotate(label, xy=(x, y),
+        ax.annotate(label,
+                    xy=(x, y),
                     xytext=(x_text, y_text),
                     arrowprops=dict(facecolor='black', shrink=0.05))
     fig.tight_layout()
-    fig.savefig(svg_path, format='svg', dpi=30)
+    # 输出成svg，不过太了，即使用 rasterized 栅格化，也900K
+    # fig.savefig(jpg_path, format='svg') #, dpi=100)
+    fig.savefig(jpg_path, format='jpg')
 
     # 2023.2.16,bugfix for 内存泄露 https://stackoverflow.com/questions/7101404/how-can-i-release-memory-after-creating-matplotlib-figures
     fig.clf()
     plt.close()
     del dfs
-
+    gc.collect

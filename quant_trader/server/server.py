@@ -104,6 +104,7 @@ def startup(app):
 
     app.run(host='0.0.0.0',
             port=CONF['broker_server']['port'],
+            threaded=True, # 使用多线程，解决在api1服务器上无响应的问题
             use_reloader=False)  # use_reloader false是防止scheduler启动多次
     logger.info("系统启动完成，端口：%d", CONF['broker_server']['port'])
 

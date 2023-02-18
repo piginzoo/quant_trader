@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import logging
+import os
+import time
 
 from bs4 import BeautifulSoup
 from flask import Blueprint, request, render_template
@@ -25,11 +27,10 @@ def query():
     broker_name = request.args.get('broker', None)
 
     if action == 'etf':
-        svg_path = generator.generate(CONF)
-        with open(svg_path) as f:
-            buf = f.read()
-        soup = BeautifulSoup(buf)
-        return render_template('svg.html', svg=Markup(str(soup)))
+        jpg_url = generator.generate(CONF)
+        stat = os.stat(f'web_root{jpg_url}')
+        file_timestamp = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(stat.st_ctime))
+        return render_template('jpg.html', image=jpg_url, time=file_timestamp)
 
     query_url = f"/api?action={action}&token={token}&broker={broker_name}"
 
