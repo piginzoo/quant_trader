@@ -56,7 +56,7 @@ def is_need_regenerate(full_path):
     :return:
     """
     if not os.path.exists(full_path):
-        return False
+        return True
     stat = os.stat(full_path)
     file_date = time.strftime('%Y%m%d', time.localtime(stat.st_ctime))
     today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
