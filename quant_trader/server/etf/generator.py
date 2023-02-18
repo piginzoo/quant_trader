@@ -27,10 +27,10 @@ def generate(conf):
     jpg_url = conf["etf"]["jpg_path"]
     jpg_fullpath = f'web_root{jpg_url}'
 
-    # if not is_need_regenerate(jpg_fullpath):
-    #     today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
-    #     logger.debug("今日[%s]图片已经生成，直接返回：%s", today_date, jpg_fullpath)
-    #     return jpg_url
+    if not is_need_regenerate(jpg_fullpath):
+        today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
+        logger.debug("今日[%s]图片已经生成，直接返回：%s", today_date, jpg_fullpath)
+        return jpg_url
 
     dfs = []
     # 510330.SH.csv
@@ -77,6 +77,7 @@ def load(file_path):
 
 def calc(df):
     df['ma'] = df.close.rolling(window=850, min_periods=1).mean()
+    df['ma'] = df['ma'].shift(1) # 把昨天的ma，当做今天需要计算用的ma，这个是因为我盘中算的时候，用的ma，肯定是昨天的ma
     df['diff_percent_close2ma'] = (df.close - df.ma) / df.ma
     p = df[df.diff_percent_close2ma > 0].diff_percent_close2ma.quantile(0.8)
     n = df[df.diff_percent_close2ma < 0].diff_percent_close2ma.quantile(1 - 0.4)
