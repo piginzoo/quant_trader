@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -98,19 +99,23 @@ def generate_jpg(dfs, jpg_path):
 
         x = df.iloc[-1].date
         y = df.iloc[-1].close + 0.1
-        x_text = df.iloc[-100].date
+        x_text = df.iloc[-200].date
         y_text = df.iloc[-1].close + 0.2
         positive = df.iloc[-1].p
         negative = df.iloc[-1].n
         ax.text(df.iloc[0].date, df.close.max(), '正收益80%分位数：{:.2f}%'.format(positive * 100))
         ax.text(df.iloc[0].date, df.close.max() - 0.2, '负收益20%分位数：{:.2f}%'.format(negative * 100), color='r')
-        label = str(round(df.iloc[-1].diff_percent_close2ma * 100, 2)) + "%"
+        last_date = datetime.strftime(x,"%Y-%m-%d")
+        print(last_date)
+        label = f"{last_date}  {round(df.iloc[-1].diff_percent_close2ma * 100, 2)}%"
         ax.annotate(label,
+                    color='r',
                     xy=(x, y),
                     xytext=(x_text, y_text),
                     arrowprops=dict(facecolor='black', shrink=0.05))
     fig.tight_layout()
     # 输出成svg，不过太了，即使用 rasterized 栅格化，也900K
+    # 改为jpg，并且，每日只生成1次
     # fig.savefig(jpg_path, format='svg') #, dpi=100)
     fig.savefig(jpg_path, format='jpg')
 
