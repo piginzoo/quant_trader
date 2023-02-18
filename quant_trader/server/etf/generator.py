@@ -27,10 +27,10 @@ def generate(conf):
     jpg_url = conf["etf"]["jpg_path"]
     jpg_fullpath = f'web_root{jpg_url}'
 
-    if not is_need_regenerate(jpg_fullpath):
-        today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
-        logger.debug("今日[%s]图片已经生成，直接返回：%s", today_date, jpg_fullpath)
-        return jpg_url
+    # if not is_need_regenerate(jpg_fullpath):
+    #     today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
+    #     logger.debug("今日[%s]图片已经生成，直接返回：%s", today_date, jpg_fullpath)
+    #     return jpg_url
 
     dfs = []
     # 510330.SH.csv
@@ -106,8 +106,11 @@ def generate_jpg(dfs, jpg_path):
         ax.text(df.iloc[0].date, df.close.max(), '正收益80%分位数：{:.2f}%'.format(positive * 100))
         ax.text(df.iloc[0].date, df.close.max() - 0.2, '负收益40%分位数：{:.2f}%'.format(negative * 100), color='r')
         last_date = datetime.strftime(x,"%Y-%m-%d")
-        print(last_date)
-        label = f"{last_date}  {round(df.iloc[-1].diff_percent_close2ma * 100, 2)}%"
+        label = \
+f"""日期:{last_date}
+收盘:{df.iloc[-1].close}
+850均值:{round(df.iloc[-1].ma,2)}
+距离均值:{round(df.iloc[-1].diff_percent_close2ma * 100, 2)}%"""
         ax.annotate(label,
                     color='r',
                     xy=(x, y),
