@@ -76,15 +76,15 @@ def load(file_path):
 
 
 def calc(df):
-    df['ma'] = df.close.rolling(window=850, min_periods=1).mean()
-    df['ma'] = df['ma'].shift(1) # 把昨天的ma，当做今天需要计算用的ma，这个是因为我盘中算的时候，用的ma，肯定是昨天的ma
-    df['diff_percent_close2ma'] = (df.close - df.ma) / df.ma
-    p = df[df.diff_percent_close2ma > 0].diff_percent_close2ma.quantile(0.8)
-    n = df[df.diff_percent_close2ma < 0].diff_percent_close2ma.quantile(1 - 0.4)
-    df['ma_upper'] = df.ma * (1 + p)
-    df['ma_lower'] = df.ma * (1 + n)
-    df['p'] = p
-    df['n'] = n
+df['ma'] = df.close.rolling(window=850, min_periods=1).mean()
+df['ma'] = df['ma'].shift(1) # 把昨天的ma，当做今天需要计算用的ma，这个是因为我盘中算的时候，用的ma，肯定是昨天的ma
+df['diff_percent_close2ma'] = (df.close - df.ma) / df.ma
+p = df[df.diff_percent_close2ma > 0].diff_percent_close2ma.quantile(0.8)
+n = df[df.diff_percent_close2ma < 0].diff_percent_close2ma.quantile(1 - 0.4)
+df['ma_upper'] = df.ma * (1 + p)
+df['ma_lower'] = df.ma * (1 + n)
+df['p'] = p
+df['n'] = n
     return df
 
 

@@ -95,7 +95,7 @@ def api():
                 data.append({
                     'title': '交易记录',
                     'type': 'table',
-                    'data': utils.dataframe_to_dict_list(pd.read_csv("data/transaction.csv"))}
+                    'data': utils.dataframe_to_dict_list(pd.read_csv("data/transaction.csv",encoding='gb2312'))}
                 )
                 logger.debug("返回data/transaction.csv")
             return jsonify(
