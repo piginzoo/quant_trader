@@ -89,7 +89,7 @@ def calc(df):
 
 
 def generate_jpg(dfs, jpg_path):
-    fig = plt.figure(figsize=(20, 5 * len(dfs)))
+    fig = plt.figure(figsize=(10, 3 * len(dfs)))
     for i, df in enumerate(dfs):
         ax = fig.add_subplot(len(dfs), 1, i + 1)  # , rasterized=True) # rasterized 栅格化，把svg矢量变图片
         ax.set_title(df.iloc[0].code)
