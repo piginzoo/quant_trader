@@ -5,6 +5,13 @@ if [ "$1" = "stop" ]; then
     exit
 fi
 
+if [ "$1" = "restart" ]; then
+    echo "停止 Web 服务"
+    ps aux|grep quant_trader|grep -v grep|awk '{print $2}'|xargs kill -9
+    sleep 1
+    echo "启动 Web 服务"
+    nohup python -m quant_trader.server.server>logs/log.txt 2>&1 &
+fi
 
 if [ "$1" = "debug" ]; then
     echo "调试模式..."
