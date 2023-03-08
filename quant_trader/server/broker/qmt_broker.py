@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from quant_trader.server.broker.broker import Broker
@@ -21,7 +22,8 @@ class QMTBroker(Broker):
         now = beijing_time()
         # 更新最后更新时间
         self.last_active_datetime[name] = now
-        logger.debug("更新了[%s]的最后活动时间为：%r",name,now)
+        s_lastime =  'None' if name is None else datetime.datetime.strftime(now, "%Y-%m-%d %H:%M:%S")
+        logger.debug("更新了[%s]的最后活动时间为：%s",name,s_lastime)
 
     def set_status(self, name, status):
         self.server_status[name] = status
