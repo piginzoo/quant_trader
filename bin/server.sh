@@ -21,6 +21,7 @@ if [ "$1" = "restart" ]; then
     echo "重启服务：启动 Web 服务"
     mkdir -p logs
     nohup python -m quant_trader.server.server>logs/log.txt 2>&1 &
+    exit
 fi
 
 if [ "$1" = "debug" ]; then
