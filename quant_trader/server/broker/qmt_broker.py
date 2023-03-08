@@ -14,13 +14,15 @@ class QMTBroker(Broker):
     """
 
     def __init__(self):
-        self.last_active_datetime = {}
-        self.server_status = {}  # online | offline
+        self.last_active_datetime = {} # 最后更新时间
+        self.server_status = {}  # online | offline 在线还是离线
 
     def heartbeat(self, name):
         now = beijing_time()
         # 更新最后更新时间
         self.last_active_datetime[name] = now
+        logger.debug("更新了[%s]的最后活动时间为：%r",name,now)
 
     def set_status(self, name, status):
         self.server_status[name] = status
+        logger.debug("更新了[%s]的最后状态为：%s", name, status)

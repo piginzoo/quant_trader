@@ -98,7 +98,7 @@ def handle(broker):
         # 超时了
         if abs(now - lastime) > datetime.timedelta(minutes=timeout):
             broker.server_status = 'offline'
-            notifier.notify(f'服务[{name}]超时：超时时间[{now - lastime}]分钟 大于 规定时间[{timeout}]分钟', ERROR)
+            notifier.notify(f'服务[{name}]超时：超时时间[{now - lastime}]分钟 大于 规定时间[{timeout}]分钟，上次更新时间为：{lastime}', ERROR)
             continue
 
         logger.debug("[%s]心跳正常", name)

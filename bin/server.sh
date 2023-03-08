@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 还是经常OOM，每晚凌晨1点重启服务，crontab -e
+# 0 1 * * * /home/ubuntu/workspace/quant_trader/bin/server.sh restart
+
 # 获得脚本所在路径
 HOME_DIR=`dirname $0`
 
