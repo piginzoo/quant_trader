@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js">
-    </script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
     <script type="text/javascript">
         /* 接收到的数据格式如下：
         var test_data =
@@ -22,6 +21,7 @@
                  {'title': '头寸情况', 'type': 'dict', 'data': {'总资金':1234,'总市值':5678}}
              ]
         }
+
         其中，type标识是table还是dict，分别显示不同的形式
         */
 
@@ -106,25 +106,14 @@
         }
 
         //动态创建字典类型数据展示
-        /*
-        <div class="list-group">
-            <div class="list-group-item">
-                <div class="col-md-4 ">{{key}}</div>
-                <div class="col-md-4"> {{value}}</div>
-            </div>
-        </div>
-        */
         function create_dict(data,selector){
             console.log('显示dict数据：'+data);
-            var root = $('<div/>')
+            var root = $('<ul/>')
             root.css("class","list-group");
             for (var k in data) {
                 v = data[k]
-
-                var item = $('<div/>',{"class":"list-group-item"})
-                var key = $('<div/>',{"class":"col-md-4"}).html(k);
-                var value = $('<div/>',{"class":"col-md-4"}).html(v);
-                item.append(key);
+                var item = $('<li/>',{"class":"list-group-item"}).html(k);
+                var value = $('<span/>',{"class":"badge"}).html(v);
                 item.append(value);
                 root.append(item);
             }
