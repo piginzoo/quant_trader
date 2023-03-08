@@ -38,9 +38,10 @@
                 success: function (data) {
                     handle(data);
                 },
-                error: function (res) {
-                    console.log("错误发生：")
-                    console.log(res)
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+            　　　　console.log(XMLHttpRequest.status);
+            　　　　console.log(XMLHttpRequest.readyState);
+            　　　　console.log(textStatus);
                 }
             });
         });
