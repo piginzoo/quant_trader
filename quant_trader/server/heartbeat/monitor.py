@@ -11,8 +11,6 @@ from quant_trader.utils.utils import date2str
 
 logger = logging.getLogger(__name__)
 
-last_active_datetime = {}
-
 
 def beijing_time(s_time=None):
     """
@@ -46,7 +44,7 @@ def get_heartbeat_conf(name):
 
 
 def handle(broker):
-    last_active_datetime = broker.last_active_datetime
+
     # 非交易日不检查
     if not is_trade_day(datetime.datetime.now()):
         logger.debug("今日不是交易日")
@@ -73,11 +71,11 @@ def handle(broker):
     for heartbeat in heartbeats:
         name = heartbeat['name']
         # 看看缓存的上次更新时间
-        lastime = last_active_datetime.get(name, None)
+        lastime = broker.last_active_datetime.get(name, None)
         # 如果是第一次，记录一个起始时间
         if lastime is None:
             # 先记录一下时间戳，用于下次算
-            last_active_datetime[name] = now
+            broker.last_active_datetime[name] = now
             logger.debug("开启[%s]心跳的监控",name)
             continue
 
