@@ -88,7 +88,7 @@ def handle(broker):
         # 如果不在交易时间，就返回
         if now < begin_time or now > end_time:
             logger.debug("现在[%s]不是交易时间", date2str(now))
-            # continue
+            continue
 
         # 看看上次缓存时间是不是超过timeout（默认30分钟），如果是，发通知
         timeout = heartbeat['timeout']
