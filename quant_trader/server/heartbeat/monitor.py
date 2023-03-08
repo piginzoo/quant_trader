@@ -93,12 +93,13 @@ def handle(broker):
         # 看看上次缓存时间是不是超过timeout（默认30分钟），如果是，发通知
         timeout = heartbeat['timeout']
 
+        s_lastime = datetime.datetime.strftime(lastime, "%Y-%m-%d %H:%M:%S")
+
         # 超时了
         if abs(now - lastime) > datetime.timedelta(minutes=timeout):
             broker.server_status = 'offline'
-            s_lastime = datetime.datetime.strftime(lastime, "%Y-%m-%d %H:%M:%S")
             notifier.notify(f'服务[{name}]超时：超时时间[{now - lastime}]分钟 大于 规定时间[{timeout}]分钟，上次更新时间为：{s_lastime}', ERROR)
             continue
 
-        logger.debug("[%s]心跳正常", name)
+        logger.debug("[%s]心跳正常，最后更新时间：%s", name,s_lastime)
     return True
