@@ -458,9 +458,14 @@ def unserialize(file_path):
 
 
 def dataframe_to_dict_list(df):
+    """
+    把dataframe变成一个每行都带着列名的json
+    :param df:
+    :return:
+    """
+    df = df.fillna(0) # 有nan转化成json，会解析报错
     data = df.values.tolist()
     columns = df.columns.tolist()
     return [
-        dict(zip(columns, datum))
-        for datum in data
+        dict(zip(columns, datum)) for datum in data
     ]
