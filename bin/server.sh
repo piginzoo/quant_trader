@@ -17,7 +17,7 @@ if [ "$1" = "restart" ]; then
     cd "$HOME_DIR/.."
     echo "重启服务：停止 Web 服务"
     pkill -9  -f 'quant_trader.server.server'
-    sleep 1
+    sleep 3
     echo "重启服务：启动 Web 服务"
     mkdir -p logs
     nohup python -m quant_trader.server.server>logs/log.txt 2>&1 &
