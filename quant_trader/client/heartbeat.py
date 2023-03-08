@@ -45,7 +45,7 @@ def run():
 
             if response.status_code != 200:
                 logger.warning('接口异常，返回码不是200:%r', response)
-                return
+                continue
 
             data = response.json()
             if data and data.get('code', None) is not None and data['code'] == 0:
