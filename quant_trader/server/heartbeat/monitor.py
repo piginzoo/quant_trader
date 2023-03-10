@@ -81,14 +81,16 @@ def handle(broker):
 
         # check_time: 9:30~11:30,13:00~15:00  => QMT
         # check_time: 9:30~15:00 => Server
-        for time_scope in heartbeat['check_time'].split(","):
+        for time_scope in heartbeat['check_time'].split(","): # 多个时间段
+            # 处理一个时间段内，开始~结束中，发生超时
+
             check_time = time_scope.split("~")  # 9:30~15:00
             # 开市的时间
             begin_time = beijing_time(check_time[0])  # 9：30
             # 闭市的时间
             end_time = beijing_time(check_time[1])  # 15：:00
 
-            # 如果目前是在这个checktime的交易时间（qmt和server不同，为何区部分，qmt是由QMT软件发送的，server是我自己的程序发送的）
+            # 如果目前是在这个checktime的交易时间（qmt和server不同，为何？qmt是由QMT软件发送的，server是我自己的程序发送的）
             if now > begin_time and now < end_time:
 
                 # 读配置中的超时时间是多少，默认是30分钟
@@ -98,8 +100,10 @@ def handle(broker):
 
                 # 如果超时了
                 if abs(now - lastime) > datetime.timedelta(minutes=timeout):
-                    broker.server_status = 'offline'
-                    notifier.notify(f'服务[{name}]超时：超时时间[{now - lastime}]分钟 大于 规定时间[{timeout}]分钟，上次更新时间为：{s_lastime}', ERROR)
+                    broker.server_status[name] = 'offline'
+                    msg = f'服务[{name}]在交易时段[{date2str(begin_time)}~{date2str(end_time)}]超时：超时时间[{now - lastime}]分钟 大于 规定时间[{timeout}]分钟，上次更新时间为：{s_lastime}'
+                    notifier.notify(msg, ERROR)
+                    logger.warning(msg)
                     break # break是跳出当前的for，就是不查其他的时间段了，这个类型的超时就处理完了
 
         logger.debug("[%s]心跳正常，最后更新时间：%s", name,s_lastime)
