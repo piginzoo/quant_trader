@@ -101,7 +101,7 @@ def handle(broker):
                 # 如果超时了
                 if abs(now - lastime) > datetime.timedelta(minutes=timeout):
                     broker.server_status[name] = 'offline'
-                    msg = f'服务[{name}]在交易时段[{date2str(begin_time)}~{date2str(end_time)}]超时：超时时间[{now - lastime}]分钟 大于 规定时间[{timeout}]分钟，上次更新时间为：{s_lastime}'
+                    msg = f'服务[{name}]在交易时段[{date2str(begin_time,"%Y-%m-%d %H:%M:%S")}~{date2str(end_time,"%Y-%m-%d %H:%M:%S")}]超时：超时时间[{now - lastime}]分钟 大于 规定时间[{timeout}]分钟，上次更新时间为：{s_lastime}'
                     notifier.notify(msg, ERROR)
                     logger.warning(msg)
                     break # break是跳出当前的for，就是不查其他的时间段了，这个类型的超时就处理完了
