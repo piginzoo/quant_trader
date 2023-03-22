@@ -64,6 +64,10 @@ def api():
 
         if action == QERUY_QMT:
             accounts = utils.unserialize("data/accounts.json")
+            # 加工一下accounts
+            accounts['盈亏比'] = str(round(100*accounts['总盈亏']/accounts['总市值'],2))+"%"
+            accounts['总盈亏'] = round(accounts['总盈亏'],2)
+
             positions = utils.unserialize("data/positions.json")
             deals = utils.unserialize("data/deals.json")
             return jsonify(
