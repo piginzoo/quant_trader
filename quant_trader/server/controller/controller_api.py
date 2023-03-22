@@ -67,6 +67,7 @@ def api():
             # 加工一下accounts
             accounts[0]['盈亏比'] = str(round(100*accounts[0]['总盈亏']/accounts[0]['总市值'],2))+"%"
             accounts[0]['总盈亏'] = round(accounts[0]['总盈亏'],2)
+            accounts[0]['总市值'] = round(accounts[0]['总市值'], 2)
 
             positions = utils.unserialize("data/positions.json")
             deals = utils.unserialize("data/deals.json")
