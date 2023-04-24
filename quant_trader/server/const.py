@@ -5,4 +5,5 @@ HEARTBEAT = "heartbeat" # 心跳💓
 HEARTBEAT_QUERY = "heartbeat_query"
 QERUY_QMT = "query_qmt"
 QERUY_SERVER = "query_server"
+MARKET_VALUE = "market_value"
 UNKNOWN = 'Unknown'

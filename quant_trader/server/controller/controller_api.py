@@ -11,6 +11,7 @@ from flask import Blueprint, jsonify, request
 
 from quant_trader.server import broker
 from quant_trader.server.const import *
+from quant_trader.server.etf import trades
 from quant_trader.utils import CONF, utils
 
 logger = logging.getLogger(__name__)
@@ -65,8 +66,8 @@ def api():
         if action == QERUY_QMT:
             accounts = utils.unserialize("data/accounts.json")
             # 加工一下accounts
-            accounts[0]['盈亏比'] = str(round(100*accounts[0]['总盈亏']/accounts[0]['总市值'],2))+"%"
-            accounts[0]['总盈亏'] = round(accounts[0]['总盈亏'],2)
+            accounts[0]['盈亏比'] = str(round(100 * accounts[0]['总盈亏'] / accounts[0]['总市值'], 2)) + "%"
+            accounts[0]['总盈亏'] = round(accounts[0]['总盈亏'], 2)
             accounts[0]['总市值'] = round(accounts[0]['总市值'], 2)
 
             positions = utils.unserialize("data/positions.json")
@@ -100,7 +101,7 @@ def api():
                 data.append({
                     'title': '交易记录',
                     'type': 'table',
-                    'data': utils.dataframe_to_dict_list(pd.read_csv("data/transaction.csv",encoding='gb2312'))}
+                    'data': utils.dataframe_to_dict_list(pd.read_csv("data/transaction.csv", encoding='gb2312'))}
                 )
                 logger.debug("返回data/transaction.csv")
             return jsonify(
@@ -145,7 +146,7 @@ def api():
                     utils.serialize(i['data'], file_name)
 
                     # 这个是为了保存历史用的
-                    today = datetime.datetime.strftime(datetime.datetime.now(),"%Y%m%d")
+                    today = datetime.datetime.strftime(datetime.datetime.now(), "%Y%m%d")
                     file_name = f"data/{i['name']}.{today}.json"
                     utils.serialize(i['data'], file_name)
                     logger.debug("数据保存到：%s", file_name)
@@ -178,6 +179,11 @@ def api():
             if status: s_status = status
             logger.debug("查询[%s]心跳结果：最后更新时间：%s，状态：%r", name, s_lastime, status)
             return jsonify({'code': 0, 'name': name, 'lastime': s_lastime, 'status': s_status}), 200
+
+        if action == MARKET_VALUE:
+            df = trades.market_values(CONF['etf']['dir'])
+            return jsonify(
+                {'code': 0, 'name': 'market value', 'data': utils.dataframe_to_dict_list(df)}), 200
 
         logger.error("无效的访问参数：%r", request.args.get)
         return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200

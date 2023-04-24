@@ -25,6 +25,7 @@ def query():
     token = request.args.get('token', None)
     action = request.args.get('action', None)
     broker_name = request.args.get('broker', None)
+    query_url = f"/api?action={action}&token={token}&broker={broker_name}"
 
     if action == 'etf':
         jpg_url = generator.generate(CONF)
@@ -32,7 +33,8 @@ def query():
         file_timestamp = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(stat.st_ctime))
         return render_template('jpg.html', image=jpg_url, time=file_timestamp)
 
-    query_url = f"/api?action={action}&token={token}&broker={broker_name}"
+    if action == 'market_value':
+        return render_template('chart.html', query_url=query_url, token=token)
 
     # 加一个安全限制
     if token is None or token != CONF['broker_server']['token']:

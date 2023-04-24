@@ -93,11 +93,15 @@ def generate_jpg(dfs, jpg_path):
     for i, df in enumerate(dfs):
         ax = fig.add_subplot(len(dfs), 1, i + 1)  # , rasterized=True) # rasterized 栅格化，把svg矢量变图片
         ax.set_title(df.iloc[0].code)
+
+        # 画线
         ax.plot(df.date, df.close)
         ax.plot(df.date, df.ma, color='#6495ED', linestyle='--', linewidth=1)
+        # 画80%，-40%区间
         ax.fill_between(df.date, df.ma_upper, df.ma_lower, alpha=0.2)
         ax.set_ylabel('etf基金价格')
 
+        # 写右侧的图上的标注文字
         x = df.iloc[-1].date
         y = df.iloc[-1].close + 0.1
         x_text = df.iloc[-200].date

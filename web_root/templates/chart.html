@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>图表</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <canvas id="myChart"></canvas>
+    <div>
+        <a class="btn btn-block btn-primary vcenter" href="/query?token={{token}}" role="button">返回</a>
+    </div>
+
+    <script>
+        // 获取canvas对象
+        var ctx = document.getElementById('myChart').getContext('2d');
+
+        // 通过fetch获取数据
+        fetch('{{ query_url | safe }}')
+            .then(response => response.json())
+            .then(data => {
+                // 将日期字符串转换为Date对象
+                data = data.data
+                data = data.map(obj => ({ date: new Date(obj.date), value: obj.value }));
+
+                data = data.map(item => {
+                  const newDate = moment(item.date, 'YYYY-MM-DD').format('YYYY/MM/DD');
+                  return { date: newDate, value: item.value };
+                });
+
+                // 定义数据
+                var chartData = {
+                    labels: data.map(obj => obj.date),
+                    datasets: [{
+                        label: "市值变化",
+                        data: data.map(obj => obj.value),
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        fill: true // 设置为true，使用阴影填充
+                    }],
+                };
+
+                // 定义选项
+                var chartOptions = {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                };
+
+                // 创建图表对象
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: chartData,
+                    options: chartOptions
+                });
+            });
+    </script>
+</body>
+</html>
