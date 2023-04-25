@@ -146,3 +146,11 @@ f"""日期:{last_date}
     plt.close()
     del dfs
     gc.collect
+
+# python -m quant_trader.server.etf.generator
+if __name__ == '__main__':
+    utils.init_logger()
+    conf = {}
+    conf['etf']['dir'] = 'data'
+    conf["etf"]["jpg_path"] =  '/static/img/etf.jpg'
+    generate_by_process(conf)
