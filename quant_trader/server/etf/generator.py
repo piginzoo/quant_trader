@@ -48,7 +48,7 @@ def generate(conf):
         df = calc(df)
         logger.debug("计算了[%s]数据:%s", code, file_path)
         dfs.append(df)
-        dfs = df
+        dfs = [df]
     generate_jpg(dfs, jpg_fullpath)
     logger.debug("生成了JPG图:%s", jpg_fullpath)
     return jpg_url
