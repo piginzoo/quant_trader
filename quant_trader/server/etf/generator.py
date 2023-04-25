@@ -152,6 +152,6 @@ if __name__ == '__main__':
     conf = {}
     conf['etf'] = {}
     conf['etf']['dir'] = 'data'
-    conf["etf"]["jpg_path"] =  '/static/img/etf.jpg'
+    conf["etf"]["jpg_dir"] =  '/static/img/etf'
     # generate_by_process(conf)
     generate(conf)
