@@ -43,7 +43,7 @@ def generate(conf):
         df = calc(df)
         logger.debug("计算了[%s]数据:%s", code, file_path)
         jpg_name = f[:9]
-        jpg_full_path = os.path.join(jpg_full_path,jpg_name)
+        jpg_full_path = os.path.join(jpg_full_dir,jpg_name)
         if not is_need_regenerate(jpg_full_path):
             today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
             logger.debug("今日[%s] 图片已经生成，直接返回：%s", today_date, jpg_full_path)
