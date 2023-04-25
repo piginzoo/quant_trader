@@ -95,6 +95,10 @@ def generate_by_process(conf):
     p.join()
     logger.debug("启动新进程，生成了jpg")
 
+    jpg_url = conf["etf"]["jpg_path"]
+    jpg_fullpath = f'web_root{jpg_url}'
+    return  jpg_fullpath
+
 def generate_jpg(dfs, jpg_path):
     fig = plt.figure(figsize=(10, 3 * len(dfs)))
     for i, df in enumerate(dfs):
