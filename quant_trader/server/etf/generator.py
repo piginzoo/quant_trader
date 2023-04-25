@@ -28,7 +28,7 @@ def generate(conf):
     jpg_dir = conf["etf"]["jpg_dir"]
     jpg_full_dir = f'web_root{jpg_dir}'
     if not os.path.exists(jpg_full_dir):
-        os.path.mkdir(jpg_full_dir)
+        os.mkdir(jpg_full_dir)
 
     jpg_paths = []
     # 510330.SH.csv
