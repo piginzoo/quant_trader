@@ -151,6 +151,7 @@ f"""日期:{last_date}
 if __name__ == '__main__':
     utils.init_logger()
     conf = {}
+    conf['etf'] = {}
     conf['etf']['dir'] = 'data'
     conf["etf"]["jpg_path"] =  '/static/img/etf.jpg'
     generate_by_process(conf)
