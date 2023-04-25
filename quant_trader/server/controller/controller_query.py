@@ -28,7 +28,7 @@ def query():
     query_url = f"/api?action={action}&token={token}&broker={broker_name}"
 
     if action == 'etf':
-        jpg_url = generator.generate(CONF)
+        jpg_url = generator.generate_by_process(CONF)
         stat = os.stat(f'web_root{jpg_url}')
         file_timestamp = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(stat.st_ctime))
         return render_template('jpg.html', image=jpg_url, time=file_timestamp)

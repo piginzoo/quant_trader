@@ -88,6 +88,13 @@ def calc(df):
     return df
 
 
+def generate_by_process(conf):
+    from multiprocessing import Process
+    p = Process(target=generate, args=(conf,))
+    p.start()
+    p.join()
+    logger.debug("启动新进程，生成了jpg")
+
 def generate_jpg(dfs, jpg_path):
     fig = plt.figure(figsize=(10, 3 * len(dfs)))
     for i, df in enumerate(dfs):
