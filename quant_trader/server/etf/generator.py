@@ -8,6 +8,8 @@ import matplotlib
 import logging
 import gc
 
+from quant_trader.utils import utils
+
 logger = logging.getLogger(__name__)
 matplotlib.use('agg')
 
@@ -21,6 +23,7 @@ def generate(conf):
     :return:
     """
 
+    utils.init_logger()
     # 加载各个etf,存放目录里面还有别的文件，所以要过滤下
     # 为何不单独放一个目录，是因为就不通用了，那个目录里放着所有需要upload服务器的文件
     etf_dir = conf['etf']['dir']
