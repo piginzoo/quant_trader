@@ -12,6 +12,25 @@ from quant_trader.utils import utils
 
 logger = logging.getLogger(__name__)
 matplotlib.use('agg')
+NAMES = {
+    "510330.SH": "沪深300",
+    "510500.SH": "中证500",
+    "159915.SZ": "创业板",
+    "588090.SH": "科创50",
+    "512880.SH": "证券",
+    "512200.SH": "地产",
+    "512660.SH": "军工",
+    "512010.SH": "医药",
+    "512800.SH": "银行",
+    "512690.SH": "酒",
+    "510810.SH": "上海国企",
+    "512980.SH": "传媒",
+    "512760.SH": "半导体芯片",
+    "159928.SZ": "消费",
+    "515000.SH": "科技龙头",
+    "516160.SH": "新能源",
+    "512580.SH": "环保"
+}
 
 
 def generate(conf):
@@ -43,7 +62,8 @@ def generate(conf):
         df = calc(df)
         logger.debug("计算了[%s]数据:%s", code, file_path)
         jpg_name = f[:9]
-        jpg_full_path = os.path.join(jpg_full_dir,jpg_name)
+        cname = NAMES[jpg_name]
+        jpg_full_path = os.path.join(jpg_full_dir, jpg_name)
 
         # url和真实路径不一样： full_path: web_root/static/img/etf url: /static/img/etf
         jpg_url = os.path.join(jpg_dir, jpg_name)
@@ -54,9 +74,10 @@ def generate(conf):
             logger.debug("今日[%s] 图片已经生成，直接返回：%s", today_date, jpg_full_path)
             continue
 
-        generate_jpg(df, jpg_full_path)
+        generate_jpg(df, cname, jpg_full_path)
         logger.debug("生成了JPG图:%s", jpg_full_path)
     return jpg_urls
+
 
 def is_need_regenerate(full_path):
     """
@@ -69,7 +90,7 @@ def is_need_regenerate(full_path):
     stat = os.stat(full_path)
     file_date = time.strftime('%Y%m%d', time.localtime(stat.st_ctime))
     today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
-    logger.debug("文件%s vs 今日%s",file_date,today_date)
+    logger.debug("文件%s vs 今日%s", file_date, today_date)
     return not file_date == today_date
 
 
@@ -85,7 +106,7 @@ def load(file_path):
 
 def calc(df):
     df['ma'] = df.close.rolling(window=850, min_periods=1).mean()
-    df['ma'] = df['ma'].shift(1) # 把昨天的ma，当做今天需要计算用的ma，这个是因为我盘中算的时候，用的ma，肯定是昨天的ma
+    df['ma'] = df['ma'].shift(1)  # 把昨天的ma，当做今天需要计算用的ma，这个是因为我盘中算的时候，用的ma，肯定是昨天的ma
     df['diff_percent_close2ma'] = (df.close - df.ma) / df.ma
     p = df[df.diff_percent_close2ma > 0].diff_percent_close2ma.quantile(0.8)
     n = df[df.diff_percent_close2ma < 0].diff_percent_close2ma.quantile(1 - 0.4)
@@ -107,10 +128,11 @@ def generate_by_process(conf):
     jpg_fullpath = f'web_root{jpg_url}'
     return jpg_fullpath
 
-def generate_jpg(df, jpg_path):
+
+def generate_jpg(df,cname, jpg_path):
     fig = plt.figure(figsize=(10, 3))
     ax = fig.add_subplot(1, 1, 1)  # , rasterized=True) # rasterized 栅格化，把svg矢量变图片
-    ax.set_title(df.iloc[0].code)
+    ax.set_title(f"{df.iloc[0].code} {cname}")
 
     # 画线
     ax.plot(df.date, df.close)
@@ -128,11 +150,11 @@ def generate_jpg(df, jpg_path):
     negative = df.iloc[-1].n
     ax.text(df.iloc[0].date, df.close.max(), '正收益80%分位数：{:.2f}%'.format(positive * 100))
     ax.text(df.iloc[0].date, df.close.max() - 0.2, '负收益40%分位数：{:.2f}%'.format(negative * 100), color='r')
-    last_date = datetime.strftime(x,"%Y-%m-%d")
+    last_date = datetime.strftime(x, "%Y-%m-%d")
     label = \
-f"""日期:{last_date}
+        f"""日期:{last_date}
 收盘:{df.iloc[-1].close}
-850均值:{round(df.iloc[-1].ma,4)}
+850均值:{round(df.iloc[-1].ma, 4)}
 距离均值:{round(df.iloc[-1].diff_percent_close2ma * 100, 4)}%"""
     ax.annotate(label,
                 color='r',
@@ -150,12 +172,13 @@ f"""日期:{last_date}
     plt.close()
     gc.collect
 
+
 # python -m quant_trader.server.etf.generator
 if __name__ == '__main__':
     utils.init_logger()
     conf = {}
     conf['etf'] = {}
     conf['etf']['dir'] = 'data'
-    conf["etf"]["jpg_dir"] =  '/static/img/etf'
+    conf["etf"]["jpg_dir"] = '/static/img/etf'
     # generate_by_process(conf)
     generate(conf)
