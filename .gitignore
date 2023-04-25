@@ -10,3 +10,4 @@ __pycache__/
 .DS_Store
 logs
 etf.jpg
+web_root/static/img/etf/
