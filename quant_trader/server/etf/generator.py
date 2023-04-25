@@ -30,7 +30,7 @@ def generate(conf):
     if not os.path.exists(jpg_full_dir):
         os.mkdir(jpg_full_dir)
 
-    jpg_paths = []
+    jpg_urls = []
     # 510330.SH.csv
     for f in os.listdir(etf_dir):
         # 必须是包含：csv和SH、SZ的文件
@@ -44,6 +44,11 @@ def generate(conf):
         logger.debug("计算了[%s]数据:%s", code, file_path)
         jpg_name = f[:9]
         jpg_full_path = os.path.join(jpg_full_dir,jpg_name)
+
+        # url和真实路径不一样： full_path: web_root/static/img/etf url: /static/img/etf
+        jpg_url = os.path.join(jpg_dir, jpg_name)
+        jpg_urls.append(jpg_url)
+
         if not is_need_regenerate(jpg_full_path):
             today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
             logger.debug("今日[%s] 图片已经生成，直接返回：%s", today_date, jpg_full_path)
@@ -51,8 +56,7 @@ def generate(conf):
 
         generate_jpg(df, jpg_full_path)
         logger.debug("生成了JPG图:%s", jpg_full_path)
-        jpg_paths.append(jpg_full_path)
-    return jpg_paths
+    return jpg_urls
 
 def is_need_regenerate(full_path):
     """

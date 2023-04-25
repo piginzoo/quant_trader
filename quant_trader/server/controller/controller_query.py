@@ -28,10 +28,10 @@ def query():
     query_url = f"/api?action={action}&token={token}&broker={broker_name}"
 
     if action == 'etf':
-        jpg_url = generator.generate_by_process(CONF)
-        stat = os.stat(f'web_root{jpg_url}')
+        jpg_urls = generator.generate(CONF)
+        stat = os.stat(f'web_root{jpg_urls[0]}')
         file_timestamp = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(stat.st_ctime))
-        return render_template('jpg.html', image=jpg_url, time=file_timestamp)
+        return render_template('jpg.html', images=jpg_urls, time=file_timestamp)
 
     if action == 'market_value':
         return render_template('chart.html', query_url=query_url, token=token)

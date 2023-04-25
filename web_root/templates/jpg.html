@@ -17,7 +17,8 @@
   </div>
 
    <p>生成时间：{{time}}</p>
-   <img style="width:100%" src="{{ image }}" alt="ETF定投图片">
-
+   {% for image in images %}
+    <img style="width:100%" src="{{ image }}" alt="ETF定投图片">
+   {% endfor %}
 </body>
 </html>
