@@ -22,20 +22,15 @@ def generate(conf):
     :param conf:
     :return:
     """
-
-    utils.init_logger()
     # 加载各个etf,存放目录里面还有别的文件，所以要过滤下
     # 为何不单独放一个目录，是因为就不通用了，那个目录里放着所有需要upload服务器的文件
     etf_dir = conf['etf']['dir']
-    jpg_url = conf["etf"]["jpg_path"]
-    jpg_fullpath = f'web_root{jpg_url}'
+    jpg_dir = conf["etf"]["jpg_dir"]
+    jpg_full_dir = f'web_root{jpg_dir}'
+    if not os.path.exists(jpg_full_dir):
+        os.path.mkdir(jpg_full_dir)
 
-    if not is_need_regenerate(jpg_fullpath):
-        today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
-        logger.debug("今日[%s]图片已经生成，直接返回：%s", today_date, jpg_fullpath)
-        return jpg_url
-
-    dfs = []
+    jpg_paths = []
     # 510330.SH.csv
     for f in os.listdir(etf_dir):
         # 必须是包含：csv和SH、SZ的文件
@@ -47,12 +42,17 @@ def generate(conf):
         logger.debug("加载了[%s]文件:%s", code, file_path)
         df = calc(df)
         logger.debug("计算了[%s]数据:%s", code, file_path)
-        dfs.append(df)
-        dfs = [df]
-    generate_jpg(dfs, jpg_fullpath)
-    logger.debug("生成了JPG图:%s", jpg_fullpath)
-    return jpg_url
+        jpg_name = f[:9]
+        jpg_full_path = os.path.join(jpg_full_path,jpg_name)
+        if not is_need_regenerate(jpg_full_path):
+            today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
+            logger.debug("今日[%s] 图片已经生成，直接返回：%s", today_date, jpg_full_path)
+            continue
 
+        generate_jpg(df, jpg_full_path)
+        logger.debug("生成了JPG图:%s", jpg_full_path)
+        jpg_paths.append(jpg_full_path)
+    return jpg_paths
 
 def is_need_regenerate(full_path):
     """
@@ -101,41 +101,40 @@ def generate_by_process(conf):
 
     jpg_url = conf["etf"]["jpg_path"]
     jpg_fullpath = f'web_root{jpg_url}'
-    return  jpg_fullpath
+    return jpg_fullpath
 
-def generate_jpg(dfs, jpg_path):
-    fig = plt.figure(figsize=(10, 3 * len(dfs)))
-    for i, df in enumerate(dfs):
-        ax = fig.add_subplot(len(dfs), 1, i + 1)  # , rasterized=True) # rasterized 栅格化，把svg矢量变图片
-        ax.set_title(df.iloc[0].code)
+def generate_jpg(df, jpg_path):
+    fig = plt.figure(figsize=(10, 3))
+    ax = fig.add_subplot(1, 1, 1)  # , rasterized=True) # rasterized 栅格化，把svg矢量变图片
+    ax.set_title(df.iloc[0].code)
 
-        # 画线
-        ax.plot(df.date, df.close)
-        ax.plot(df.date, df.ma, color='#6495ED', linestyle='--', linewidth=1)
-        # 画80%，-40%区间
-        ax.fill_between(df.date, df.ma_upper, df.ma_lower, alpha=0.2)
-        ax.set_ylabel('etf基金价格')
+    # 画线
+    ax.plot(df.date, df.close)
+    ax.plot(df.date, df.ma, color='#6495ED', linestyle='--', linewidth=1)
+    # 画80%，-40%区间
+    ax.fill_between(df.date, df.ma_upper, df.ma_lower, alpha=0.2)
+    ax.set_ylabel('etf基金价格')
 
-        # 写右侧的图上的标注文字
-        x = df.iloc[-1].date
-        y = df.iloc[-1].close + 0.1
-        x_text = df.iloc[-200].date
-        y_text = df.iloc[-1].close + 0.2
-        positive = df.iloc[-1].p
-        negative = df.iloc[-1].n
-        ax.text(df.iloc[0].date, df.close.max(), '正收益80%分位数：{:.2f}%'.format(positive * 100))
-        ax.text(df.iloc[0].date, df.close.max() - 0.2, '负收益40%分位数：{:.2f}%'.format(negative * 100), color='r')
-        last_date = datetime.strftime(x,"%Y-%m-%d")
-        label = \
+    # 写右侧的图上的标注文字
+    x = df.iloc[-1].date
+    y = df.iloc[-1].close + 0.1
+    x_text = df.iloc[-200].date
+    y_text = df.iloc[-1].close + 0.2
+    positive = df.iloc[-1].p
+    negative = df.iloc[-1].n
+    ax.text(df.iloc[0].date, df.close.max(), '正收益80%分位数：{:.2f}%'.format(positive * 100))
+    ax.text(df.iloc[0].date, df.close.max() - 0.2, '负收益40%分位数：{:.2f}%'.format(negative * 100), color='r')
+    last_date = datetime.strftime(x,"%Y-%m-%d")
+    label = \
 f"""日期:{last_date}
 收盘:{df.iloc[-1].close}
 850均值:{round(df.iloc[-1].ma,4)}
 距离均值:{round(df.iloc[-1].diff_percent_close2ma * 100, 4)}%"""
-        ax.annotate(label,
-                    color='r',
-                    xy=(x, y),
-                    xytext=(x_text, y_text),
-                    arrowprops=dict(facecolor='black', shrink=0.05))
+    ax.annotate(label,
+                color='r',
+                xy=(x, y),
+                xytext=(x_text, y_text),
+                arrowprops=dict(facecolor='black', shrink=0.05))
     fig.tight_layout()
     # 输出成svg，不过太了，即使用 rasterized 栅格化，也900K
     # 改为jpg，并且，每日只生成1次
@@ -145,7 +144,6 @@ f"""日期:{last_date}
     # 2023.2.16,bugfix for 内存泄露 https://stackoverflow.com/questions/7101404/how-can-i-release-memory-after-creating-matplotlib-figures
     fig.clf()
     plt.close()
-    del dfs
     gc.collect
 
 # python -m quant_trader.server.etf.generator
@@ -155,4 +153,5 @@ if __name__ == '__main__':
     conf['etf'] = {}
     conf['etf']['dir'] = 'data'
     conf["etf"]["jpg_path"] =  '/static/img/etf.jpg'
-    generate_by_process(conf)
+    # generate_by_process(conf)
+    generate(conf)
