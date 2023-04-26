@@ -55,24 +55,25 @@ def generate(conf):
         # 必须是包含：csv和SH、SZ的文件
         if "csv" not in f: continue
         if "SH" not in f and "SZ" not in f: continue
+        jpg_name = f[:9]
+        # url和真实路径不一样： full_path: web_root/static/img/etf url: /static/img/etf
+        jpg_url = os.path.join(jpg_dir, jpg_name)
+        jpg_urls.append(jpg_url)
+        jpg_full_path = os.path.join(jpg_full_dir, jpg_name)
+
+
+        if not is_need_regenerate(jpg_full_path):
+            today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
+            logger.debug("今日[%s] 图片已经生成，直接返回：%s", today_date, jpg_full_path)
+            continue
+
         file_path = os.path.join(etf_dir, f)
         df = load(file_path)
         code = df.iloc[0].code
         logger.debug("加载了[%s]文件:%s", code, file_path)
         df = calc(df)
         logger.debug("计算了[%s]数据:%s", code, file_path)
-        jpg_name = f[:9]
         cname = NAMES[jpg_name]
-        jpg_full_path = os.path.join(jpg_full_dir, jpg_name)
-
-        # url和真实路径不一样： full_path: web_root/static/img/etf url: /static/img/etf
-        jpg_url = os.path.join(jpg_dir, jpg_name)
-        jpg_urls.append(jpg_url)
-
-        if not is_need_regenerate(jpg_full_path):
-            today_date = time.strftime('%Y%m%d', time.localtime(time.time()))
-            logger.debug("今日[%s] 图片已经生成，直接返回：%s", today_date, jpg_full_path)
-            continue
 
         generate_jpg(df, cname, jpg_full_path)
         logger.debug("生成了JPG图:%s", jpg_full_path)
@@ -170,7 +171,8 @@ def generate_jpg(df,cname, jpg_path):
     # 2023.2.16,bugfix for 内存泄露 https://stackoverflow.com/questions/7101404/how-can-i-release-memory-after-creating-matplotlib-figures
     fig.clf()
     plt.close()
-    gc.collect
+    del fig
+    # gc.collect
 
 
 # python -m quant_trader.server.etf.generator
