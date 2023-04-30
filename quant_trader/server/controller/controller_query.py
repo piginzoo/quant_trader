@@ -33,8 +33,9 @@ def query():
         file_timestamp = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(stat.st_ctime))
         return render_template('jpg.html', images=jpg_urls, time=file_timestamp)
 
-    # /query?action=chatgpt
-    if action == 'chatgpt':
+    # http://stock.piginzoo.com/query?action=chatgpt&token=piginzoo
+    # 为了可以方便地重置warp ip
+    if action == 'chatgpt' and token and token == 'piginzoo':
         logger.debug("刷新了Warp地址")
         # warp-cli disconnect && sleep 3 &&warp-cli connect
         os.popen('warp-cli disconnect && sleep 3 &&warp-cli connect')
