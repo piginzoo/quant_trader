@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 import logging
 import os
+import subprocess
 import time
 
 from bs4 import BeautifulSoup
@@ -37,8 +38,14 @@ def query():
     if action == 'chatgpt':
         logger.debug("刷新了Warp地址")
         # warp-cli disconnect && sleep 3 &&warp-cli connect
-        os.popen('warp-cli disconnect && sleep 3 &&warp-cli connect')
-        return "已经更换IP地址，刷新chatgpt重试，如遇429错误码，继续访问此url"
+        # os.popen('/usr/bin/warp-cli disconnect && sleep 3 &&/usr/bin/warp-cli connect')
+        process = subprocess.Popen(['/usr/bin/warp-cli disconnect && sleep 3 &&/usr/bin/warp-cli connect'], stdout=subprocess.PIPE, shell=True)
+        output, error = process.communicate()
+        output = output.decode('utf-8')
+        if 'Success' in output:
+            return "已成功重置IP，请返回chatgpt重试，如仍然429错误，继续运行此url"
+        else:
+            return f"尝试重置IP失败，原因：{output}"
 
     # 加一个安全限制
     if token is None or token != CONF['broker_server']['token']:
