@@ -20,6 +20,11 @@ def market_values(home_dir):
         date = f[10:18]
         for p in positions:
             market_value += p['市值']
+
+        # 2023.5.16，市值不知为何无限大，异常的话，就剔除这个数据
+        import math
+        if math.isinf(market_value): continue
+
         df = df.append({'date': utils.str2date(date), 'value': market_value}, ignore_index=True)
 
     df.sort_values(by='date', inplace=True)
