@@ -76,7 +76,7 @@
 
                 // 定义数据
                 var chartData = {
-                    labels: data.map(obj => obj['名称']),
+                    labels: data.map(obj => obj['代码']+obj['名称']),
                     datasets: [{
                         label: "市值占比",
                         data: data.map(obj => obj['市值']),
@@ -89,8 +89,9 @@
                     responsive: true,
                     plugins: {
                       legend: {
-                        position: 'bottom'
+                        position: 'top'
                       },
+
                       tooltip: {
                         callbacks: {
                           label: function(context) {
@@ -103,7 +104,18 @@
                             return label + ': ' + value + ' (' + percentage + '%)';
                           }
                         }
+                      },
+
+                      datalabels: {
+                        color: '#fff',
+                        anchor: 'end',
+                        align: 'start',
+                        formatter: function(value, context) {
+                          var label = context.chart.data.labels[context.dataIndex];
+                          return label + ' (' + value + ')';
+                        }
                       }
+
                     }
                 };
 
