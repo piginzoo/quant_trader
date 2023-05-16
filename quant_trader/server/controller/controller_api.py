@@ -185,6 +185,11 @@ def api():
             return jsonify(
                 {'code': 0, 'name': 'market value', 'data': utils.dataframe_to_dict_list(df)}), 200
 
+        if action == PORTFOLIO:
+            positions = utils.unserialize("data/positions.json")
+            return jsonify(
+                {'code': 0, 'name': 'portfolio', 'data': positions}), 200
+
         logger.error("无效的访问参数：%r", request.args.get)
         return jsonify({'code': -1, 'msg': f'Invalid request:{request.args}'}), 200
 

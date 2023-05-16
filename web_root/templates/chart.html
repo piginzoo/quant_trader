@@ -11,16 +11,17 @@
 </head>
 <body>
     <canvas id="myChart"></canvas>
+    <canvas id="myPie"></canvas>
     <div>
         <a class="btn btn-block btn-primary vcenter" href="/query?token={{token}}" role="button">返回</a>
     </div>
 
     <script>
         // 获取canvas对象
-        var ctx = document.getElementById('myChart').getContext('2d');
+        var ctx1 = document.getElementById('myChart').getContext('2d');
 
         // 通过fetch获取数据
-        fetch('{{ query_url | safe }}')
+        fetch('{{ query_url+'&action=market_value' | safe }}')
             .then(response => response.json())
             .then(data => {
                 // 将日期字符串转换为Date对象
@@ -57,12 +58,63 @@
                 };
 
                 // 创建图表对象
-                var myChart = new Chart(ctx, {
+                var myChart = new Chart(ctx1, {
                     type: 'line',
                     data: chartData,
                     options: chartOptions
                 });
             });
+
+        // 获取canvas对象
+        var ctx2 = document.getElementById('myPie').getContext('2d');
+
+        // 通过fetch获取数据
+        fetch('{{ query_url+'&action=portfolio' | safe }}')
+            .then(response => response.json())
+            .then(data => {
+                data = data.data
+
+                // 定义数据
+                var chartData = {
+                    labels: data.map(obj => obj['名称']),
+                    datasets: [{
+                        label: "市值占比",
+                        data: data.map(obj => obj['市值']),
+                        borderWidth: 1,
+                    }],
+                };
+
+                // 定义选项
+                var chartOptions = {
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        position: 'bottom'
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function(context) {
+                            var label = context.label || '';
+                            var value = context.parsed || 0;
+                            var total = context.dataset.data.reduce(function(previousValue, currentValue) {
+                              return previousValue + currentValue;
+                            });
+                            var percentage = Math.round((value / total) * 100);
+                            return label + ': ' + value + ' (' + percentage + '%)';
+                          }
+                        }
+                      }
+                    }
+                };
+
+                // 创建图表对象
+                var myChart = new Chart(ctx2, {
+                    type: 'pie',
+                    data: chartData,
+                    options: chartOptions
+                });
+            });
+
     </script>
 </body>
 </html>

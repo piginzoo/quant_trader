@@ -26,7 +26,7 @@ def query():
     token = request.args.get('token', None)
     action = request.args.get('action', None)
     broker_name = request.args.get('broker', None)
-    query_url = f"/api?action={action}&token={token}&broker={broker_name}"
+
 
     if action == 'etf':
         jpg_urls = generator.generate(CONF)
@@ -52,10 +52,12 @@ def query():
         logger.error("客户端的toke[%r]!=配置的[%s]，无效的访问", token, CONF['broker_server']['token'])
         return "无效的访问", 400
 
-    if action == 'market_value':
+    if action == 'chart':
+        query_url = f"/api?token={token}&broker={broker_name}"
         return render_template('chart.html', query_url=query_url, token=token)
 
     if action:
+        query_url = f"/api?action={action}&token={token}&broker={broker_name}"
         return render_template('table.html', query_url=query_url, token=token)
 
     return render_template('index.html', token=token)
